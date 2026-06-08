@@ -1,6 +1,6 @@
-# Northline Digital — Next.js
+# Bayline Digital — Next.js
 
-Marketing site for Northline Digital, a small digital agency. Built with **Next.js 15 (App Router)**, **React 19**, **Tailwind CSS v4**, and **shadcn/ui** primitives.
+Marketing site for Bayline Digital, a custom digital studio. Built with **Next.js 15 (App Router)**, **React 19**, **Tailwind CSS v4**, and **shadcn/ui** primitives.
 
 ## Stack
 
