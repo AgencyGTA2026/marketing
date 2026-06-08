@@ -34,15 +34,6 @@ const COLS = [
       { label: "Book Intro Call ↗", href: businessConfig.calendlyUrl },
     ],
   },
-  {
-    title: "Elsewhere",
-    links: [
-      { label: "LinkedIn ↗", href: "https://linkedin.com" },
-      { label: "Clutch ↗", href: "https://clutch.co" },
-      { label: "GitHub ↗", href: "https://github.com" },
-      { label: "Dribbble ↗", href: "https://dribbble.com" },
-    ],
-  },
 ];
 
 export function Footer() {

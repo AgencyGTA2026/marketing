@@ -10,7 +10,7 @@ const PRINCIPLES = [
 
 const STATS = [
   ["40+", "Projects shipped"],
-  ["6 yrs", "In business"],
+  ["3 yrs", "In business"],
   ["96%", "Client retention"],
 ];
 
@@ -68,7 +68,7 @@ export function About() {
               ))}
             </div>
             <div className="absolute -right-2.5 -top-4 rounded-xl bg-ink px-3 py-2 font-mono text-[12px] text-bg shadow-md">
-              ● EST. 2020
+              ● EST. 2023
             </div>
           </Reveal>
         </div>
