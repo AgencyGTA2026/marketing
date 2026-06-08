@@ -29,6 +29,7 @@ const COLS = [
     title: "Studio",
     links: [
       { label: "About", href: "/#about" },
+      { label: "Blog", href: "/blog" },
       { label: "Process", href: "/#process" },
       { label: "Contact", href: "/contact" },
       { label: "Book Intro Call ↗", href: businessConfig.calendlyUrl },
