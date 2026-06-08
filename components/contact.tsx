@@ -7,6 +7,8 @@ import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import { Label } from "./ui/label";
 import { cn } from "@/lib/utils";
+import { businessConfig } from "@/lib/data/business";
+import { trackClientEvent } from "@/lib/analytics";
 
 const BUDGETS = ["<10k", "10–25k", "25–60k", "60k+"] as const;
 
@@ -89,19 +91,31 @@ export function Contact({
 
   const blur = (k: string) => () => setTouched((t) => ({ ...t, [k]: true }));
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setTouched({ name: true, email: true, company: true, details: true });
     if (Object.keys(errs).length) return;
     setSubmitting(true);
 
-    // Output submission payload to simulate lead capture database entry
-    console.log("Submit Inbound Lead Capture Payload:", data);
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
 
-    setTimeout(() => {
-      setSubmitting(false);
+      if (!res.ok) {
+        throw new Error("Failed to send inquiry");
+      }
+
+      trackClientEvent("form_submit", { company: data.company, budget: data.budget });
       setSent(true);
-    }, 900);
+    } catch (err) {
+      console.error("Submit error:", err);
+      alert("Failed to send inquiry. Please try again or email hello@baylinedigital.com directly.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -125,10 +139,25 @@ export function Contact({
             </Reveal>
 
             <Reveal className="mt-10 flex flex-col gap-[18px]">
-              <ContactRow label="Email" value="hello@baylinedigital.com" />
-              <ContactRow label="Phone" value="+1 (416) 555-0186" />
-              <ContactRow label="Hours" value="Mon–Fri · 9am–5pm ET" />
-              <ContactRow label="Office" value="Toronto, ON · remote-friendly" />
+              <ContactRow label="Email" value={businessConfig.email} />
+              <ContactRow label="Phone" value={businessConfig.phone} />
+              <ContactRow label="Hours" value={businessConfig.hours} />
+              <ContactRow label="Office" value={businessConfig.office} />
+            </Reveal>
+
+            <Reveal className="mt-8">
+              <p className="text-[14.5px] text-bg/60 m-0 leading-relaxed">
+                Prefer to schedule immediately?{" "}
+                <a
+                  href={businessConfig.calendlyUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => trackClientEvent("click_calendly", { location: "contact_sidebar" })}
+                  className="text-accent underline font-medium hover:text-white transition-colors"
+                >
+                  Book a 30-min video call ↗
+                </a>
+              </p>
             </Reveal>
           </div>
 

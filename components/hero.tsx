@@ -6,6 +6,8 @@ import { Button } from "./ui/button";
 import { useLocalTargeting } from "@/lib/hooks/useLocalTargeting";
 import Link from "next/link";
 import { Code2, Globe, Sparkles, Terminal } from "lucide-react";
+import { businessConfig } from "@/lib/data/business";
+import { trackClientEvent } from "@/lib/analytics";
 
 interface HeroProps {
   badge?: string;
@@ -62,7 +64,14 @@ export function Hero({
                 </Link>
               </Button>
               <Button asChild variant="outline">
-                <Link href="#services">View services</Link>
+                <a
+                  href={businessConfig.calendlyUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => trackClientEvent("click_calendly", { location: "hero" })}
+                >
+                  Book a call
+                </a>
               </Button>
             </Reveal>
 

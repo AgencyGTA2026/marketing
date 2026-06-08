@@ -1,5 +1,9 @@
+"use client";
+
 import { Logo } from "./logo";
 import Link from "next/link";
+import { businessConfig } from "@/lib/data/business";
+import { trackClientEvent } from "@/lib/analytics";
 
 const COLS = [
   {
@@ -28,6 +32,7 @@ const COLS = [
       { label: "Process", href: "/#process" },
       { label: "Work", href: "/work" },
       { label: "Contact", href: "/contact" },
+      { label: "Book Intro Call ↗", href: businessConfig.calendlyUrl },
     ],
   },
   {
@@ -69,6 +74,11 @@ export function Footer() {
                           href={l.href}
                           target="_blank"
                           rel="noopener noreferrer"
+                          onClick={() => {
+                            if (l.href === businessConfig.calendlyUrl) {
+                              trackClientEvent("click_calendly", { location: "footer" });
+                            }
+                          }}
                           className="text-[14px] text-ink-2 transition-colors hover:text-blue"
                         >
                           {l.label}
