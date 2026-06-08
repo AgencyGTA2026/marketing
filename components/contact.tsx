@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 import { businessConfig } from "@/lib/data/business";
 import { trackClientEvent } from "@/lib/analytics";
 
-const BUDGETS = ["<10k", "10–25k", "25–60k", "60k+"] as const;
+const BUDGETS = ["<1k", "1-5k", "5-10k", "10-25k", "25-50k", "50k+"] as const;
 
 type FormState = {
   name: string;
@@ -40,7 +40,7 @@ export function Contact({
     email: "",
     company: "",
     details: "",
-    budget: "10–25k",
+    budget: "<1k",
     customDropdownAnswer: "",
     industrySlug: industrySlug,
     utmSource: "",
@@ -112,7 +112,7 @@ export function Contact({
       setSent(true);
     } catch (err) {
       console.error("Submit error:", err);
-      alert("Failed to send inquiry. Please try again or email hello@baylinedigital.com directly.");
+      alert("Failed to send inquiry. Please try again or email contact@baylinedigital.com directly.");
     } finally {
       setSubmitting(false);
     }
@@ -171,7 +171,7 @@ export function Contact({
                     email: "",
                     company: "",
                     details: "",
-                    budget: "10–25k",
+                    budget: "<1k",
                     customDropdownAnswer: customDropdownOptions?.[0] || "",
                     industrySlug: industrySlug,
                     utmSource: data.utmSource,

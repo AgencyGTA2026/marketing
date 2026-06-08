@@ -1,8 +1,8 @@
 export const businessConfig = {
   name: "Bayline Digital",
   calendlyUrl: process.env.NEXT_PUBLIC_CALENDLY_URL || "https://calendly.com/bayline-digital/intro",
-  email: "hello@baylinedigital.com",
-  phone: "+1 (416) 555-0186",
-  hours: "Mon–Fri · 9am–5pm ET",
+  email: "contact@baylinedigital.com",
+  phone: "+1 (613) 818-8550",
+  hours: "Mon–Fri · 9am–5pm EST",
   office: "Toronto, ON · remote-friendly",
 };

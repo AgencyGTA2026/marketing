@@ -21,7 +21,7 @@ export function About() {
         <div className="grid grid-cols-1 gap-14 items-center lg:grid-cols-[1fr_1.1fr] lg:gap-20">
           <div>
             <Reveal>
-              <Eyebrow>06 — About</Eyebrow>
+              <Eyebrow>05 — About</Eyebrow>
             </Reveal>
             <Reveal as="h2" className="m-0 mt-5 mb-7 text-[clamp(36px,4.6vw,56px)] tracking-[-0.03em] leading-none font-medium">
               Bayline Digital for <br />teams that want <br />

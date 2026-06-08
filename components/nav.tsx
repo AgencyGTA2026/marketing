@@ -17,7 +17,6 @@ export function Nav() {
   const links = [
     ["Home", isHome ? "#top" : "/"],
     ["Services", isHome ? "#services" : "/services"],
-    ["Work", isHome ? "#work" : "/work"],
     ["Process", isHome ? "#process" : "/#process"],
     ["About", isHome ? "#about" : "/#about"],
   ] as const;
