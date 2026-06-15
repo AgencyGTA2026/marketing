@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { businessConfig } from "@/lib/data/business";
 import { trackClientEvent } from "@/lib/analytics";
 import { SERVICE_OPTIONS } from "@/lib/data/locations";
+import { SELECT_SERVICE_EVENT } from "./service-cta";
 
 const BUDGETS = ["<1k", "1-5k", "5-10k", "10-25k", "25-50k", "50k+"] as const;
 
@@ -144,6 +145,19 @@ export function Contact({
       industrySlug: industrySlug || d.industrySlug || params.get("industry") || "",
     }));
   }, [industrySlug, city, service, isLocal]);
+
+  // Let a service-section CTA pre-select the service in the form.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const handler = (e: Event) => {
+      const next = (e as CustomEvent<string>).detail;
+      if (next && SERVICE_OPTIONS.includes(next)) {
+        setData((d) => ({ ...d, service: next }));
+      }
+    };
+    window.addEventListener(SELECT_SERVICE_EVENT, handler);
+    return () => window.removeEventListener(SELECT_SERVICE_EVENT, handler);
+  }, []);
 
   // Set default selection for dynamic dropdown
   useEffect(() => {

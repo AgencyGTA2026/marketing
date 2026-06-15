@@ -11,7 +11,8 @@ import { Reveal } from "@/components/reveal";
 import { SectionHeader } from "@/components/section-header";
 import { MobileStickyCTA } from "@/components/mobile-sticky-cta";
 import { LocationPageView } from "@/components/location-page-view";
-import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { ServiceCta } from "@/components/service-cta";
+import { CheckCircle2 } from "lucide-react";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -170,13 +171,7 @@ export default async function LocationLandingPage({ params }: PageProps) {
                     ))}
                   </ul>
                   <div className="mt-6">
-                    <Link
-                      href="#contact"
-                      className="inline-flex items-center gap-2 rounded-full bg-ink px-4 py-2.5 text-[13.5px] font-medium text-bg transition-transform hover:-translate-y-px"
-                    >
-                      {svc.ctaLabel}
-                      <ArrowRight size={14} />
-                    </Link>
+                    <ServiceCta service={svc.serviceName} label={svc.ctaLabel} city={cityName} />
                   </div>
                 </Reveal>
               ))}
