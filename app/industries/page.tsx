@@ -1,12 +1,16 @@
+import type { Metadata } from "next";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { Reveal } from "@/components/reveal";
 import { ArrowRight, Shield, Brain, Zap } from "lucide-react";
 import Link from "next/link";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Industries We Serve | Bayline Digital",
   description: "Explore Bayline Digital solutions for home services, marketing firms, and B2B teams that need stronger websites and smarter workflows.",
+  alternates: {
+    canonical: "/industries",
+  },
 };
 
 const INDUSTRIES = [

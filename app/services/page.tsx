@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Nav } from "@/components/nav";
 import { Services } from "@/components/services";
 import { Footer } from "@/components/footer";
@@ -6,9 +7,12 @@ import { ArrowRight, Code, Cpu, Server, Zap, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Our Services | Bayline Digital",
   description: "Explore Bayline Digital services for website design, web application development, workflow automation, and managed support.",
+  alternates: {
+    canonical: "/services",
+  },
 };
 
 export default function ServicesPage() {

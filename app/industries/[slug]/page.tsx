@@ -42,6 +42,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: industry.metaTitle,
     description: industry.metaDescription,
+    alternates: {
+      canonical: `/industries/${slug}`,
+    },
   };
 }
 

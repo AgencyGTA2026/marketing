@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import { ArrowRight, BookOpen } from "lucide-react";
@@ -7,10 +8,13 @@ import type { BlogPost } from "@autoblogwriter/sdk";
 import { Footer } from "@/components/footer";
 import { Nav } from "@/components/nav";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Blog | Bayline Digital",
   description:
     "Practical notes from Bayline Digital on modern websites, automation, SEO systems, and custom digital operations.",
+  alternates: {
+    canonical: "/blog",
+  },
 };
 
 export default async function BlogPage() {

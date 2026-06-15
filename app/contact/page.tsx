@@ -1,11 +1,15 @@
+import type { Metadata } from "next";
 import { Nav } from "@/components/nav";
 import { Contact } from "@/components/contact";
 import { Footer } from "@/components/footer";
 import { Reveal } from "@/components/reveal";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Contact Us | Bayline Digital",
   description: "Get in touch with Bayline Digital to discuss a website redesign, custom web app, or workflow automation project.",
+  alternates: {
+    canonical: "/contact",
+  },
 };
 
 export default function ContactPage() {
