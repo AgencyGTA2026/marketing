@@ -174,7 +174,6 @@ export function Contact({
     if (!data.name.trim()) e.name = "Please enter your name";
     if (!data.email.trim()) e.email = "Please enter your email";
     else if (!/^\S+@\S+\.\S+$/.test(data.email)) e.email = "That email looks off";
-    if (!data.details.trim() || data.details.trim().length < 12) e.details = "Tell us a little more (12+ chars)";
     return e;
   }, [data]);
 
@@ -205,7 +204,7 @@ export function Contact({
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setTouched({ name: true, email: true, company: true, details: true });
+    setTouched({ name: true, email: true });
     if (Object.keys(errs).length) return;
     setSubmitting(true);
 
@@ -403,14 +402,13 @@ export function Contact({
                 )}
 
                 <Field
-                  label="Project details"
+                  label="Project details (optional)"
                   id="details"
                   textarea
                   value={data.details}
                   onChange={setField("details")}
                   onBlur={blur("details")}
-                  err={touched.details ? errs.details : undefined}
-                  placeholder="A few sentences about your project, timeline, and what success looks like."
+                  placeholder="Optional — a few words about your project, timeline, or what success looks like."
                 />
 
                 <div className="mt-6 flex flex-wrap items-center justify-between gap-4">

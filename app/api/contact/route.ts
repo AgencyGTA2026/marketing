@@ -95,7 +95,7 @@ export async function POST(request: Request) {
         },
         {
           type: "section",
-          text: { type: "mrkdwn", text: `*Project details:*\n${details}` },
+          text: { type: "mrkdwn", text: `*Project details:*\n${details?.trim() || "_None provided_"}` },
         },
       ],
     };
