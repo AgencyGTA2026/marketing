@@ -4,19 +4,19 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2.5 whitespace-nowrap rounded-full font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center gap-2.5 whitespace-nowrap font-black uppercase tracking-tight transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue focus-visible:ring-offset-2 focus-visible:ring-offset-bg disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
         default:
-          "bg-ink text-bg border border-ink shadow-sm hover:bg-ink-2 hover:-translate-y-px hover:shadow-[0_14px_30px_-14px_rgba(14,27,50,.4)]",
+          "bg-ink text-bg border-2 border-ink shadow-[5px_5px_0_0_var(--color-blue)] hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-[2px_2px_0_0_var(--color-blue)]",
         outline:
-          "bg-transparent text-ink border border-line-2 hover:bg-bg-card",
+          "bg-bg text-ink border-2 border-ink shadow-[5px_5px_0_0_var(--color-ink)] hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-[2px_2px_0_0_var(--color-ink)]",
         ghost: "hover:bg-bg-sunken text-ink-2",
         link: "text-ink-2 underline-offset-4 hover:underline",
       },
       size: {
-        default: "h-12 px-[22px] text-[15px]",
+        default: "h-12 px-[22px] text-[14px]",
         sm: "h-10 px-4 text-sm",
         lg: "h-14 px-7 text-base",
         icon: "h-10 w-10",

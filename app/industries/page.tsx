@@ -45,18 +45,17 @@ export default function IndustriesIndexPage() {
     <>
       <Nav />
       <main className="bg-bg">
-        <section className="relative pt-24 pb-16 bg-bg">
-          <div className="mx-auto w-full max-w-[1280px] px-8">
-            <div className="max-w-[760px]">
-              <Reveal className="mb-6 inline-flex items-center gap-2.5 font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
-                <span className="inline-block h-1.5 w-1.5 rounded-full bg-blue" />
+        <section className="relative border-b-4 border-ink bg-bg pt-20 pb-16">
+          <div className="mx-auto w-full max-w-[1280px] px-5 sm:px-8">
+            <div className="max-w-[860px]">
+              <Reveal className="mb-6 inline-flex items-center gap-2.5 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-blue">
+                <span className="inline-block h-1.5 w-1.5 bg-blue" />
                 Industry Targeting
               </Reveal>
-              <Reveal as="h1" className="m-0 text-[clamp(40px,5vw,72px)] leading-[1.05] tracking-[-0.03em] font-medium text-ink">
-                Solutions tailored for <br />
-                <span className="font-serif italic text-blue text-[1.02em]">your specific market</span>.
+              <Reveal as="h1" className="m-0 font-display text-[clamp(2.5rem,7vw,5.5rem)] font-black uppercase leading-[0.9] tracking-tighter text-ink">
+                Built for <span className="bg-blue px-2 text-white">your market</span>
               </Reveal>
-              <Reveal as="p" className="mt-8 text-[18px] leading-[1.6] text-muted">
+              <Reveal as="p" className="mt-8 max-w-[640px] font-mono text-[15px] leading-relaxed text-muted">
                 Bayline adapts the same disciplined design and engineering process to very different
                 operating realities. Choose your sector to see how we shape messaging, workflows,
                 and systems around the way your business actually runs.
@@ -66,41 +65,41 @@ export default function IndustriesIndexPage() {
         </section>
 
         {/* Industry Cards Grid */}
-        <section className="pb-32 bg-bg">
-          <div className="mx-auto w-full max-w-[1280px] px-8">
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <section className="bg-bg px-5 pb-32 sm:px-8">
+          <div className="mx-auto w-full max-w-[1280px]">
+            <div className="grid grid-cols-1 border-2 border-ink md:grid-cols-3">
               {INDUSTRIES.map((ind) => {
                 const Icon = ind.icon;
                 return (
                   <Reveal
                     key={ind.slug}
-                    className="group relative flex flex-col justify-between rounded-[22px] border border-line bg-bg-card p-8 shadow-sm transition-all duration-300 ease-[cubic-bezier(.2,.7,.2,1)] hover:-translate-y-[3px] hover:shadow-md"
+                    className="group relative -mt-px -ml-px flex flex-col justify-between border-2 border-ink bg-bg-card p-8 transition-colors duration-150 hover:bg-ink hover:text-bg"
                   >
                     <Link href={`/industries/${ind.slug}`} className="absolute inset-0 z-10" aria-label={`View ${ind.title} solutions`} />
-                    
+
                     <div>
-                      <div className="flex items-center justify-between mb-8 relative z-20">
-                        <span className="rounded-full border border-blue-pale bg-blue-pale/40 px-2.5 py-1 font-mono text-[10px] text-blue font-medium">
+                      <div className="relative z-20 mb-8 flex items-center justify-between">
+                        <span className="border-2 border-ink bg-blue px-2.5 py-1 font-mono text-[10px] font-bold uppercase text-white group-hover:border-bg">
                           {ind.badge}
                         </span>
-                        <div className="h-8 w-8 rounded-full border border-line flex items-center justify-center text-ink group-hover:bg-ink group-hover:text-bg transition-colors duration-200">
-                          <Icon size={14} />
+                        <div className="flex h-9 w-9 items-center justify-center border-2 border-ink group-hover:border-bg">
+                          <Icon size={16} strokeWidth={2.5} />
                         </div>
                       </div>
 
-                      <h3 className="m-0 text-[24px] font-medium tracking-tight mb-3 relative z-20">
+                      <h3 className="relative z-20 m-0 mb-3 font-display text-2xl font-black uppercase leading-tight tracking-tight">
                         {ind.title}
                       </h3>
-                      <p className="m-0 text-[14.5px] leading-[1.6] text-muted mb-6 relative z-20">
+                      <p className="relative z-20 m-0 mb-6 font-mono text-[13px] leading-snug opacity-80">
                         {ind.desc}
                       </p>
                     </div>
 
-                    <div className="pt-5 border-t border-line mt-6 flex justify-between items-center relative z-20">
-                      <span className="font-mono text-[10.5px] text-muted-2">
+                    <div className="relative z-20 mt-6 flex items-center justify-between border-t-2 border-current/25 pt-5">
+                      <span className="font-mono text-[10.5px] font-bold uppercase opacity-70">
                         {ind.project}
                       </span>
-                      <span className="text-blue font-medium flex items-center gap-1 text-[13.5px]">
+                      <span className="flex items-center gap-1 text-[13px] font-black uppercase tracking-tight">
                         Explore
                         <ArrowRight size={14} className="transition-transform duration-200 group-hover:translate-x-1" />
                       </span>

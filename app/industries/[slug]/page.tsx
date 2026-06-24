@@ -82,7 +82,7 @@ export default async function IndustryLandingPage({ params }: PageProps) {
           visualType={industry.hero.visualType}
         />
 
-        <section className="py-24 border-t border-line bg-bg-sunken">
+        <section className="border-t-4 border-ink py-24 bg-bg-sunken">
           <div className="mx-auto w-full max-w-[1280px] px-8">
             <SectionHeader
               eyebrow="01 — Market problems"
@@ -93,7 +93,7 @@ export default async function IndustryLandingPage({ params }: PageProps) {
             <div className="mt-14 grid grid-cols-1 gap-5 lg:grid-cols-[1.1fr_0.9fr]">
               <div className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-1">
                 {industry.industryProblems.map((problem, index) => (
-                  <Reveal key={problem.title} className="rounded-[18px] border border-line bg-bg-card p-6 shadow-sm">
+                  <Reveal key={problem.title} className="border-2 border-ink bg-bg-card p-6">
                     <div className="mb-5 font-mono text-[11px] text-muted-2">0{index + 1}</div>
                     <h3 className="m-0 mb-3 text-[20px] font-medium tracking-[-0.01em] text-ink">{problem.title}</h3>
                     <p className="m-0 text-[14.5px] leading-[1.6] text-muted">{problem.description}</p>
@@ -101,11 +101,11 @@ export default async function IndustryLandingPage({ params }: PageProps) {
                 ))}
               </div>
 
-              <Reveal className="rounded-[22px] border border-line bg-bg-card p-7 shadow-sm">
+              <Reveal className="border-2 border-ink bg-bg-card p-7">
                 <div className="mb-5 font-mono text-[11px] uppercase tracking-[0.12em] text-muted-2">For SEO and ads</div>
                 <div className="space-y-6">
                   {industry.adLandingBenefits.map((benefit) => (
-                    <div key={benefit.title} className="border-t border-line pt-5 first:border-t-0 first:pt-0">
+                    <div key={benefit.title} className="border-t-2 border-ink pt-5 first:border-t-0 first:pt-0">
                       <h3 className="m-0 mb-2 text-[18px] font-medium tracking-[-0.01em]">{benefit.title}</h3>
                       <p className="m-0 text-[14px] leading-[1.6] text-muted">{benefit.description}</p>
                     </div>
@@ -116,7 +116,7 @@ export default async function IndustryLandingPage({ params }: PageProps) {
           </div>
         </section>
 
-        <section className="py-24 border-t border-line bg-bg">
+        <section className="border-t-4 border-ink py-24 bg-bg">
           <div className="mx-auto w-full max-w-[1280px] px-8">
             <SectionHeader
               eyebrow="02 — Systems we build"
@@ -126,10 +126,10 @@ export default async function IndustryLandingPage({ params }: PageProps) {
 
             <div className="mt-14 grid grid-cols-1 gap-5 md:grid-cols-3">
               {industry.recommendedBuilds.map((build) => (
-                <Reveal key={build.title} className="flex min-h-[300px] flex-col rounded-[20px] border border-line bg-bg-card p-7 shadow-sm">
+                <Reveal key={build.title} className="flex min-h-[300px] flex-col border-2 border-ink bg-bg-card p-7">
                   <h3 className="m-0 mb-3 text-[22px] font-medium tracking-[-0.015em]">{build.title}</h3>
                   <p className="m-0 text-[14.5px] leading-[1.6] text-muted">{build.description}</p>
-                  <ul className="mt-6 list-none border-t border-line pt-5 pl-0">
+                  <ul className="mt-6 list-none border-t-2 border-ink pt-5 pl-0">
                     {build.bullets.map((bullet) => (
                       <li key={bullet} className="flex gap-2.5 py-1.5 text-[13.5px] leading-snug text-ink-2">
                         <CheckCircle2 size={16} className="mt-0.5 shrink-0 text-blue" />
@@ -143,7 +143,7 @@ export default async function IndustryLandingPage({ params }: PageProps) {
           </div>
         </section>
 
-        <section className="py-24 border-t border-line bg-bg-sunken">
+        <section className="border-t-4 border-ink py-24 bg-bg-sunken">
           <div className="mx-auto w-full max-w-[1280px] px-8">
             <SectionHeader
               eyebrow="03 — Recommended services"
@@ -153,7 +153,7 @@ export default async function IndustryLandingPage({ params }: PageProps) {
 
             <div className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {recommendedServices.map((service) => (
-                <Reveal key={service.slug} className="group relative flex min-h-[300px] flex-col rounded-[20px] border border-line bg-bg-card p-7 shadow-sm transition-all duration-300 ease-[cubic-bezier(.2,.7,.2,1)] hover:-translate-y-[3px] hover:shadow-md">
+                <Reveal key={service.slug} className="group relative flex min-h-[300px] flex-col border-2 border-ink bg-bg-card p-7 transition-all duration-300 ease-[cubic-bezier(.2,.7,.2,1)] hover:-translate-y-[3px]">
                   <Link href={`/services/${service.slug}`} className="absolute inset-0 z-30" aria-label={`Learn more about ${service.title}`} />
                   <div className="relative z-20 flex items-start justify-between">
                     <span className="font-mono text-[11px] text-muted-2">{service.number}</span>
@@ -163,7 +163,7 @@ export default async function IndustryLandingPage({ params }: PageProps) {
                   </div>
                   <h3 className="relative z-20 mt-10 mb-2.5 text-[21px] font-medium tracking-[-0.015em]">{service.title}</h3>
                   <p className="relative z-20 m-0 text-[14.5px] leading-[1.55] text-muted">{service.blurb}</p>
-                  <ul className="relative z-20 mt-5 list-none border-t border-line pt-4 pl-0">
+                  <ul className="relative z-20 mt-5 list-none border-t-2 border-ink pt-4 pl-0">
                     {service.bullets.map((bullet) => (
                       <li key={bullet} className="flex gap-2.5 py-1.5 text-[13px] text-ink-2">
                         <span className="mt-px text-blue">—</span>
@@ -177,7 +177,7 @@ export default async function IndustryLandingPage({ params }: PageProps) {
           </div>
         </section>
 
-        <section className="py-24 border-t border-line bg-bg">
+        <section className="border-t-4 border-ink py-24 bg-bg">
           <div className="mx-auto grid w-full max-w-[1280px] grid-cols-1 gap-12 px-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
             <div>
               <Reveal className="mb-4 font-mono text-[11px] uppercase tracking-[0.12em] text-muted-2">04 — Integrations</Reveal>
@@ -189,7 +189,7 @@ export default async function IndustryLandingPage({ params }: PageProps) {
               </Reveal>
             </div>
 
-            <div className="divide-y divide-line rounded-[20px] border border-line bg-bg-card">
+            <div className="divide-y-2 divide-ink border-2 border-ink bg-bg-card">
               {industry.integrationExamples.map((example) => (
                 <Reveal key={example.tool} className="grid grid-cols-1 gap-3 p-6 md:grid-cols-[180px_1fr]">
                   <div className="font-mono text-[12px] uppercase tracking-[0.08em] text-blue">{example.tool}</div>
@@ -200,14 +200,14 @@ export default async function IndustryLandingPage({ params }: PageProps) {
           </div>
         </section>
 
-        <section className="py-24 border-t border-line bg-bg-sunken">
+        <section className="border-t-4 border-ink py-24 bg-bg-sunken">
           <div className="mx-auto w-full max-w-[960px] px-8">
             <Reveal className="mb-4 font-mono text-[11px] uppercase tracking-[0.12em] text-muted-2">05 — FAQ</Reveal>
             <Reveal as="h2" className="m-0 text-[clamp(34px,4vw,52px)] leading-none tracking-[-0.03em] font-medium">
               Questions this industry page should answer.
             </Reveal>
 
-            <div className="mt-12 divide-y divide-line rounded-[20px] border border-line bg-bg-card">
+            <div className="mt-12 divide-y-2 divide-ink border-2 border-ink bg-bg-card">
               {industry.faqs.map((faq) => (
                 <Reveal key={faq.question} className="p-6">
                   <h3 className="m-0 text-[18px] font-medium tracking-[-0.01em]">{faq.question}</h3>

@@ -23,7 +23,7 @@ export function ServiceCta({ service, label, city }: ServiceCtaProps) {
         window.dispatchEvent(new CustomEvent(SELECT_SERVICE_EVENT, { detail: service }));
         trackClientEvent("service_section_click", { service, city, page_type: "location" });
       }}
-      className="inline-flex items-center gap-2 rounded-full bg-ink px-4 py-2.5 text-[13.5px] font-medium text-bg transition-transform hover:-translate-y-px"
+      className="inline-flex items-center gap-2 border-2 border-ink bg-ink px-4 py-2.5 text-[13px] font-black uppercase tracking-tight text-bg shadow-[4px_4px_0_0_var(--color-blue)] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_0_var(--color-blue)]"
     >
       {label}
       <ArrowRight size={14} />

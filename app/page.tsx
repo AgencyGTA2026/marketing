@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import { Nav } from "@/components/nav";
 import { Hero } from "@/components/hero";
-import { Philosophy } from "@/components/philosophy";
 import { Services } from "@/components/services";
+import { Philosophy } from "@/components/philosophy";
 import { WhyUs } from "@/components/why-us";
+import { StatBand } from "@/components/stat-band";
 import { Process } from "@/components/process";
 import { About } from "@/components/about";
+import { ClosingCta } from "@/components/closing-cta";
 import { Contact } from "@/components/contact";
 import { Footer } from "@/components/footer";
 
@@ -21,11 +23,13 @@ export default function Home() {
       <Nav />
       <main>
         <Hero />
-        <Philosophy />
         <Services />
+        <Philosophy />
         <WhyUs />
+        <StatBand />
         <Process />
         <About />
+        <ClosingCta />
         <Contact />
       </main>
       <Footer />

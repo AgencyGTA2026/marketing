@@ -25,18 +25,17 @@ export default async function BlogPage() {
     <>
       <Nav />
       <main className="bg-bg">
-        <section className="relative border-b border-line bg-bg pt-24 pb-16">
-          <div className="mx-auto w-full max-w-[1280px] px-8">
-            <div className="max-w-[780px]">
-              <div className="mb-6 inline-flex items-center gap-2.5 font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
-                <span className="inline-block h-1.5 w-1.5 rounded-full bg-blue" />
+        <section className="relative border-b-4 border-ink bg-bg pt-20 pb-16">
+          <div className="mx-auto w-full max-w-[1280px] px-5 sm:px-8">
+            <div className="max-w-[860px]">
+              <div className="mb-6 inline-flex items-center gap-2.5 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-blue">
+                <span className="inline-block h-1.5 w-1.5 bg-blue" />
                 Field Notes
               </div>
-              <h1 className="m-0 text-[clamp(40px,5vw,72px)] leading-[1.05] tracking-[-0.03em] font-medium text-ink">
-                Practical writing on <br />
-                <span className="font-serif italic text-blue text-[1.02em]">web systems and growth</span>.
+              <h1 className="m-0 font-display text-[clamp(2.5rem,7vw,5.5rem)] font-black uppercase leading-[0.9] tracking-tighter text-ink">
+                Web systems <span className="bg-blue px-2 text-white">& growth</span>
               </h1>
-              <p className="mt-8 max-w-[680px] text-[18px] leading-[1.6] text-muted">
+              <p className="mt-8 max-w-[680px] font-mono text-[15px] leading-relaxed text-muted">
                 Notes on better websites, cleaner content operations, automation, and the engineering
                 choices that help small teams move faster.
               </p>
@@ -47,14 +46,14 @@ export default async function BlogPage() {
         <section className="py-20">
           <div className="mx-auto w-full max-w-[1280px] px-8">
             {posts.length > 0 ? (
-              <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid grid-cols-1 border-2 border-ink md:grid-cols-2 lg:grid-cols-3">
                 {posts.map((post) => (
                   <BlogCard key={post.id} post={post} />
                 ))}
               </div>
             ) : (
-              <div className="rounded-[22px] border border-line bg-bg-card p-10 text-center shadow-sm">
-                <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-full bg-blue-pale text-blue">
+              <div className="border-2 border-ink bg-bg-card p-10 text-center">
+                <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center border-2 border-ink text-blue">
                   <BookOpen size={20} />
                 </div>
                 <h2 className="m-0 text-[24px] font-medium tracking-tight text-ink">No posts published yet</h2>
@@ -83,10 +82,10 @@ function BlogCard({ post }: { post: BlogPost }) {
   const heroImage = getHeroImage(post);
 
   return (
-    <article className="group relative flex min-h-[430px] flex-col overflow-hidden rounded-[22px] border border-line bg-bg-card shadow-sm transition-all duration-300 ease-[cubic-bezier(.2,.7,.2,1)] hover:-translate-y-[3px] hover:shadow-md">
+    <article className="group relative -mt-px -ml-px flex min-h-[430px] flex-col overflow-hidden border-2 border-ink bg-bg-card transition-colors duration-200 hover:bg-bg-sunken">
       <Link href={`/blog/${post.slug}`} className="absolute inset-0 z-10" aria-label={`Read ${post.title}`} />
       {heroImage ? (
-        <div className="aspect-[16/9] overflow-hidden border-b border-line bg-bg-sunken">
+        <div className="aspect-[16/9] overflow-hidden border-b-2 border-ink bg-bg-sunken">
           <img
             src={heroImage}
             alt=""
@@ -94,21 +93,21 @@ function BlogCard({ post }: { post: BlogPost }) {
           />
         </div>
       ) : (
-        <div className="flex aspect-[16/9] items-end border-b border-line bg-[linear-gradient(135deg,var(--color-bg-sunken),var(--color-blue-pale))] p-6">
-          <span className="font-serif text-[48px] italic leading-none text-blue/35">Journal</span>
+        <div className="flex aspect-[16/9] items-end border-b-2 border-ink bg-blue p-6">
+          <span className="font-display text-[48px] font-black uppercase leading-none tracking-tighter text-white/40">Journal</span>
         </div>
       )}
 
       <div className="flex grow flex-col p-7">
         <BlogMeta post={post} />
-        <h2 className="mt-5 mb-3 text-[24px] font-medium leading-[1.12] tracking-[-0.02em] text-ink">
+        <h2 className="mt-5 mb-3 font-display text-[22px] font-black uppercase leading-tight tracking-tight text-ink">
           {post.title}
         </h2>
         {post.excerpt && <p className="m-0 text-[14.5px] leading-[1.65] text-muted">{post.excerpt}</p>}
 
         <div className="mt-auto flex items-center justify-between gap-4 pt-8">
           <CategoryList categories={post.categories} />
-          <span className="inline-flex items-center gap-1.5 text-[13.5px] font-medium text-blue">
+          <span className="inline-flex items-center gap-1.5 text-[13px] font-black uppercase tracking-tight text-blue">
             Read
             <ArrowRight size={14} className="transition-transform duration-200 group-hover:translate-x-1" />
           </span>
@@ -143,7 +142,7 @@ function CategoryList({ categories }: { categories?: string[] }) {
       {categories.slice(0, 2).map((category) => (
         <span
           key={category}
-          className="rounded-full border border-blue-pale bg-blue-pale/45 px-2.5 py-1 font-mono text-[10px] font-medium text-blue"
+          className="border-2 border-ink bg-blue px-2.5 py-1 font-mono text-[10px] font-bold uppercase text-white"
         >
           {category}
         </span>

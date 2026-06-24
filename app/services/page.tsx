@@ -20,18 +20,17 @@ export default function ServicesPage() {
     <>
       <Nav />
       <main>
-        <section className="relative pt-24 pb-16 bg-bg">
-          <div className="mx-auto w-full max-w-[1280px] px-8">
-            <div className="max-w-[760px]">
-              <Reveal className="mb-6 inline-flex items-center gap-2.5 font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
-                <span className="inline-block h-1.5 w-1.5 rounded-full bg-blue" />
+        <section className="relative border-b-4 border-ink bg-bg pt-20 pb-16">
+          <div className="mx-auto w-full max-w-[1280px] px-5 sm:px-8">
+            <div className="max-w-[860px]">
+              <Reveal className="mb-6 inline-flex items-center gap-2.5 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-blue">
+                <span className="inline-block h-1.5 w-1.5 bg-blue" />
                 Capabilities &amp; Tech Stack
               </Reveal>
-              <Reveal as="h1" className="m-0 text-[clamp(40px,5vw,72px)] leading-[1.05] tracking-[-0.03em] font-medium text-ink">
-                How we build for <br />
-                <span className="font-serif italic text-blue text-[1.02em]">growing businesses</span>.
+              <Reveal as="h1" className="m-0 font-display text-[clamp(2.5rem,7vw,5.5rem)] font-black uppercase leading-[0.9] tracking-tighter text-ink">
+                How we build for <span className="bg-blue px-2 text-white">growth</span>
               </Reveal>
-              <Reveal as="p" className="mt-8 text-[18px] leading-[1.6] text-muted">
+              <Reveal as="p" className="mt-8 max-w-[640px] font-mono text-[15px] leading-relaxed text-muted">
                 Bayline combines strategic UX, clean engineering, and practical automation. We build
                 fast custom systems, remove manual bottlenecks, and provide hands-on support without
                 burying you in jargon.
@@ -44,14 +43,13 @@ export default function ServicesPage() {
         <Services />
 
         {/* Tech Stack deep dive section */}
-        <section className="py-24 border-t border-line bg-bg-sunken">
-          <div className="mx-auto w-full max-w-[1280px] px-8">
+        <section className="border-t-4 border-ink bg-bg-sunken py-24">
+          <div className="mx-auto w-full max-w-[1280px] px-5 sm:px-8">
             <div className="grid grid-cols-1 gap-14 lg:grid-cols-[1fr_1.2fr] lg:gap-20">
               <div>
-                <Reveal className="font-mono text-[11px] text-muted-2 uppercase tracking-[0.12em] mb-4">ENGINEERING VALUES</Reveal>
-                <Reveal as="h2" className="m-0 text-[36px] tracking-[-0.025em] leading-none font-medium mb-6">
-                  Pragmatic stack, <br />
-                  <span className="font-serif italic text-blue">solid foundations</span>.
+                <Reveal className="mb-4 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-blue">Engineering values</Reveal>
+                <Reveal as="h2" className="m-0 mb-6 font-display text-[clamp(2rem,4vw,3rem)] font-black uppercase leading-none tracking-tighter">
+                  Pragmatic stack, <span className="bg-blue px-2 text-white">solid base</span>
                 </Reveal>
                 <Reveal as="p" className="m-0 text-[15.5px] leading-[1.6] text-muted mb-6">
                   We don&apos;t build on unstable trends. Bayline uses a production-ready stack that
@@ -84,28 +82,28 @@ export default function ServicesPage() {
               </div>
 
               <Reveal className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="bg-bg-card p-6 rounded-[18px] border border-line">
+                <div className="border-2 border-ink bg-bg-card p-6 transition-colors hover:bg-bg-sunken">
                   <Code size={24} className="text-blue mb-4" />
                   <h4 className="m-0 text-[16.5px] font-medium tracking-tight mb-2">Frontend Interfaces</h4>
                   <p className="m-0 text-[13.5px] leading-relaxed text-muted">
                     Fast React components utilizing static optimization. Tested on diverse device viewports for a highly responsive, accessible experience.
                   </p>
                 </div>
-                <div className="bg-bg-card p-6 rounded-[18px] border border-line">
+                <div className="border-2 border-ink bg-bg-card p-6 transition-colors hover:bg-bg-sunken">
                   <Cpu size={24} className="text-blue mb-4" />
                   <h4 className="m-0 text-[16.5px] font-medium tracking-tight mb-2">Workflow Integration</h4>
                   <p className="m-0 text-[13.5px] leading-relaxed text-muted">
                     Automations powered by background queues, webhook synchronization, and API integrations with platforms like Twilio, Stripe, and Jobber.
                   </p>
                 </div>
-                <div className="bg-bg-card p-6 rounded-[18px] border border-line">
+                <div className="border-2 border-ink bg-bg-card p-6 transition-colors hover:bg-bg-sunken">
                   <Server size={24} className="text-blue mb-4" />
                   <h4 className="m-0 text-[16.5px] font-medium tracking-tight mb-2">Local Ontario Hosting</h4>
                   <p className="m-0 text-[13.5px] leading-relaxed text-muted">
                     Direct local hosting powered by AWS / Vercel Edge networks. Instant SSL, daily database backups, and manual server monitoring.
                   </p>
                 </div>
-                <div className="bg-bg-card p-6 rounded-[18px] border border-line">
+                <div className="border-2 border-ink bg-bg-card p-6 transition-colors hover:bg-bg-sunken">
                   <Zap size={24} className="text-blue mb-4" />
                   <h4 className="m-0 text-[16.5px] font-medium tracking-tight mb-2">Google Ads Quality Check</h4>
                   <p className="m-0 text-[13.5px] leading-relaxed text-muted">
@@ -118,11 +116,11 @@ export default function ServicesPage() {
         </section>
 
         {/* CTA section */}
-        <section className="py-24 bg-bg">
-          <div className="mx-auto w-full max-w-[1280px] px-8 text-center">
-            <Reveal className="max-w-[600px] mx-auto">
-              <h2 className="text-[32px] font-medium tracking-tight mb-4">Ready to start building?</h2>
-              <p className="text-muted text-[16px] leading-[1.6] mb-8">
+        <section className="border-t-4 border-ink bg-blue py-24 text-white">
+          <div className="mx-auto w-full max-w-[1280px] px-5 text-center sm:px-8">
+            <Reveal className="mx-auto max-w-[680px]">
+              <h2 className="mb-4 font-display text-[clamp(2rem,5vw,3.5rem)] font-black uppercase leading-none tracking-tighter">Ready to start building?</h2>
+              <p className="mb-8 font-mono text-[15px] leading-relaxed text-white/80">
                 Let&apos;s discuss your project, target deadlines, and workflow bottlenecks. We&apos;ll outline a clear proposal in one business day.
               </p>
               <Button asChild size="lg">

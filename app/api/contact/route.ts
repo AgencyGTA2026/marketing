@@ -6,6 +6,7 @@ export async function POST(request: Request) {
     const {
       name,
       email,
+      websiteUrl,
       company,
       city,
       service,
@@ -14,6 +15,7 @@ export async function POST(request: Request) {
       customDropdownAnswer,
       industrySlug,
       pageType,
+      offerType,
       utmSource,
       utmMedium,
       utmCampaign,
@@ -35,6 +37,7 @@ export async function POST(request: Request) {
       console.info("[Lead]", {
         name,
         email,
+        websiteUrl,
         company,
         city,
         service,
@@ -49,6 +52,7 @@ export async function POST(request: Request) {
         referrer,
         firstVisit,
         pageType,
+        offerType,
         details,
       });
       return NextResponse.json({ success: true, warning: "Lead logged to server console (Slack webhook unconfigured)." });
@@ -80,11 +84,13 @@ export async function POST(request: Request) {
           type: "section",
           fields: [
             { type: "mrkdwn", text: `*Name:* ${name}` },
-            { type: "mrkdwn", text: `*Email:* ${email}` },
+            { type: "mrkdwn", text: `*Email / phone:* ${email}` },
+            { type: "mrkdwn", text: `*Website URL:* ${websiteUrl || "—"}` },
             { type: "mrkdwn", text: `*City:* ${city || "—"}` },
             { type: "mrkdwn", text: `*Service:* ${service || "—"}` },
-            { type: "mrkdwn", text: `*Budget:* ${budget}` },
+            { type: "mrkdwn", text: `*Budget:* ${budget || "—"}` },
             { type: "mrkdwn", text: `*Page type:* ${pageType || "site"}` },
+            { type: "mrkdwn", text: `*Offer:* ${offerType || "general_inquiry"}` },
             { type: "mrkdwn", text: `*Custom Q:* ${customDropdownAnswer || "N/A"}` },
             { type: "mrkdwn", text: `*Industry route:* ${industrySlug || "Default home"}` },
           ],

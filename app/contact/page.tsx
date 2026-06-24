@@ -17,18 +17,17 @@ export default function ContactPage() {
     <>
       <Nav />
       <main className="bg-bg">
-        <section className="relative pt-20 pb-8">
-          <div className="mx-auto w-full max-w-[1280px] px-8">
-            <div className="max-w-[760px]">
-              <Reveal className="mb-6 inline-flex items-center gap-2.5 font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
-                <span className="inline-block h-1.5 w-1.5 rounded-full bg-blue" />
+        <section className="relative border-b-4 border-ink pt-20 pb-12">
+          <div className="mx-auto w-full max-w-[1280px] px-5 sm:px-8">
+            <div className="max-w-[860px]">
+              <Reveal className="mb-6 inline-flex items-center gap-2.5 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-blue">
+                <span className="inline-block h-1.5 w-1.5 bg-blue" />
                 Start a conversation
               </Reveal>
-              <Reveal as="h1" className="m-0 text-[clamp(40px,5vw,72px)] leading-[1.05] tracking-[-0.03em] font-medium text-ink">
-                Let&apos;s discuss <br />
-                your <span className="font-serif italic text-blue text-[1.02em]">business goals</span>.
+              <Reveal as="h1" className="m-0 font-display text-[clamp(2.5rem,7vw,5.5rem)] font-black uppercase leading-[0.9] tracking-tighter text-ink">
+                Discuss your <span className="bg-blue px-2 text-white">goals</span>
               </Reveal>
-              <Reveal as="p" className="mt-6 text-[17px] leading-[1.6] text-muted">
+              <Reveal as="p" className="mt-6 max-w-[640px] font-mono text-[15px] leading-relaxed text-muted">
                 Bayline will review your inquiry and reply with scheduling availability or
                 clarifying questions within one business day. No hard pitch, just practical next
                 steps.
@@ -41,16 +40,16 @@ export default function ContactPage() {
         <Contact />
 
         {/* Frequently asked questions / onboarding info */}
-        <section className="py-24 border-t border-line bg-bg-sunken">
-          <div className="mx-auto w-full max-w-[1280px] px-8">
+        <section className="border-t-4 border-ink bg-bg-sunken py-24">
+          <div className="mx-auto w-full max-w-[1280px] px-5 sm:px-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
               <div>
-                <Reveal className="font-mono text-[11.5px] text-muted-2 uppercase tracking-[0.12em] mb-4">WHAT TO EXPECT</Reveal>
-                <h3 className="text-[24px] font-medium tracking-tight mb-6">How Bayline kicks things off</h3>
+                <Reveal className="mb-4 font-mono text-[11.5px] font-bold uppercase tracking-[0.2em] text-blue">What to expect</Reveal>
+                <h3 className="mb-6 font-display text-[clamp(1.5rem,3vw,2.25rem)] font-black uppercase tracking-tight">How Bayline kicks things off</h3>
                 
                 <div className="space-y-6">
                   <div className="flex gap-4">
-                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-blue text-white font-mono text-[12px] shrink-0">1</span>
+                    <span className="flex h-7 w-7 items-center justify-center border-2 border-ink bg-blue text-white font-mono text-[12px] font-bold shrink-0">1</span>
                     <div>
                       <h4 className="font-semibold text-ink m-0 text-[16px]">Brief Intake Review</h4>
                       <p className="text-muted text-[14px] m-0 mt-1">We review your current site, tools, and business context before the first call so every minute is useful.</p>
@@ -58,7 +57,7 @@ export default function ContactPage() {
                   </div>
 
                   <div className="flex gap-4">
-                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-blue text-white font-mono text-[12px] shrink-0">2</span>
+                    <span className="flex h-7 w-7 items-center justify-center border-2 border-ink bg-blue text-white font-mono text-[12px] font-bold shrink-0">2</span>
                     <div>
                       <h4 className="font-semibold text-ink m-0 text-[16px]">30-Minute Video Intro</h4>
                       <p className="text-muted text-[14px] m-0 mt-1">We align on bottlenecks, scope, budget, and timing. The goal is shared clarity, not pressure.</p>
@@ -66,7 +65,7 @@ export default function ContactPage() {
                   </div>
 
                   <div className="flex gap-4">
-                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-blue text-white font-mono text-[12px] shrink-0">3</span>
+                    <span className="flex h-7 w-7 items-center justify-center border-2 border-ink bg-blue text-white font-mono text-[12px] font-bold shrink-0">3</span>
                     <div>
                       <h4 className="font-semibold text-ink m-0 text-[16px]">Fixed-Price Proposal</h4>
                       <p className="text-muted text-[14px] m-0 mt-1">We send a transparent proposal outlining deliverables, timeline, and commercial structure.</p>
@@ -76,8 +75,8 @@ export default function ContactPage() {
               </div>
 
               <div>
-                <Reveal className="font-mono text-[11.5px] text-muted-2 uppercase tracking-[0.12em] mb-4">COMMON INQUIRIES</Reveal>
-                <h3 className="text-[24px] font-medium tracking-tight mb-6">Frequently asked questions</h3>
+                <Reveal className="mb-4 font-mono text-[11.5px] font-bold uppercase tracking-[0.2em] text-blue">Common inquiries</Reveal>
+                <h3 className="mb-6 font-display text-[clamp(1.5rem,3vw,2.25rem)] font-black uppercase tracking-tight">Frequently asked questions</h3>
 
                 <div className="space-y-6">
                   <div>

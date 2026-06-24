@@ -18,6 +18,7 @@ const BUDGETS = ["<1k", "1-5k", "5-10k", "10-25k", "25-50k", "50k+"] as const;
 type FormState = {
   name: string;
   email: string;
+  websiteUrl: string;
   company: string;
   city: string;
   service: string;
@@ -47,6 +48,11 @@ interface ContactProps {
   service?: string;
   /** Page type for analytics + Slack routing. */
   pageType?: string;
+  /** Minimal form for the free website review offer on local landing pages. */
+  reviewMode?: boolean;
+  /** Minimal form for businesses that need a first website preview. */
+  previewMode?: boolean;
+  sectionId?: string;
 }
 
 // Maps a service anchor id (from a URL hash) to a SERVICE_OPTIONS label.
@@ -70,13 +76,18 @@ export function Contact({
   city = "",
   service = "",
   pageType = "site",
+  reviewMode = false,
+  previewMode = false,
+  sectionId = "contact",
 }: ContactProps) {
   const router = useRouter();
   const isLocal = pageType === "location" || !!city;
+  const isOfferMode = reviewMode || previewMode;
 
   const [data, setData] = useState<FormState>({
     name: "",
     email: "",
+    websiteUrl: "",
     company: "",
     city: city,
     service: service || (isLocal ? SERVICE_OPTIONS[0] : ""),
@@ -172,10 +183,26 @@ export function Contact({
   const errs = useMemo(() => {
     const e: Partial<Record<keyof FormState, string>> = {};
     if (!data.name.trim()) e.name = "Please enter your name";
-    if (!data.email.trim()) e.email = "Please enter your email";
-    else if (!/^\S+@\S+\.\S+$/.test(data.email)) e.email = "That email looks off";
+    if (!data.email.trim()) e.email = isOfferMode ? "Please enter your email or phone" : "Please enter your email";
+    else if (!isOfferMode && !/^\S+@\S+\.\S+$/.test(data.email)) e.email = "That email looks off";
+    if (reviewMode) {
+      const rawUrl = data.websiteUrl.trim();
+      if (!rawUrl) {
+        e.websiteUrl = "Please enter your website URL";
+      } else {
+        try {
+          new URL(rawUrl.match(/^https?:\/\//i) ? rawUrl : `https://${rawUrl}`);
+        } catch {
+          e.websiteUrl = "That URL looks off";
+        }
+      }
+    }
+    if (previewMode) {
+      if (!data.company.trim()) e.company = "Please enter your business name";
+      if (!data.details.trim()) e.details = "Please tell us what your business does";
+    }
     return e;
-  }, [data]);
+  }, [data, isOfferMode, reviewMode, previewMode]);
 
   const setField = <K extends keyof FormState>(k: K) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
@@ -204,7 +231,13 @@ export function Contact({
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setTouched({ name: true, email: true });
+    setTouched(
+      reviewMode
+        ? { name: true, email: true, websiteUrl: true }
+        : previewMode
+          ? { name: true, email: true, company: true, details: true }
+          : { name: true, email: true }
+    );
     if (Object.keys(errs).length) return;
     setSubmitting(true);
 
@@ -212,7 +245,11 @@ export function Contact({
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, pageType }),
+        body: JSON.stringify({
+          ...data,
+          pageType,
+          offerType: reviewMode ? "website_review" : previewMode ? "website_preview" : "general_inquiry",
+        }),
       });
 
       if (!res.ok) {
@@ -220,8 +257,8 @@ export function Contact({
       }
 
       // Funnel event only; /thank-you fires the primary generate_lead conversion.
-      trackClientEvent("form_submit_success", eventParams({ budget: data.budget }));
-      trackClientEvent("form_submit", { company: data.company, budget: data.budget });
+      trackClientEvent("form_submit_success", eventParams({ budget: data.budget, website_url: data.websiteUrl || undefined, offer_type: reviewMode ? "website_review" : previewMode ? "website_preview" : "general_inquiry" }));
+      trackClientEvent("form_submit", { company: data.company, budget: data.budget, website_url: data.websiteUrl || undefined, offer_type: reviewMode ? "website_review" : previewMode ? "website_preview" : "general_inquiry" });
 
       // Redirect to the dedicated thank-you page for reliable Ads conversion tracking.
       const qs = new URLSearchParams();
@@ -236,52 +273,70 @@ export function Contact({
   };
 
   return (
-    <section id="contact" className="relative overflow-hidden py-32 border-t border-line">
-      <div className="absolute inset-x-4 inset-y-[60px] z-0 rounded-[22px] bg-ink md:inset-x-8 md:rounded-[28px]" />
-      <div className="relative z-10 mx-auto w-full max-w-[1280px] px-8">
-        <div className="grid grid-cols-1 gap-14 px-7 py-12 text-bg md:grid-cols-2 md:gap-14 md:px-14 md:py-[72px]">
+    <section id={sectionId} className="relative overflow-hidden border-t-4 border-ink bg-ink py-20 text-bg">
+      <div className="relative z-10 mx-auto w-full max-w-[1280px] px-5 sm:px-8">
+        <div className="grid grid-cols-1 gap-14 py-4 text-bg md:grid-cols-2 md:gap-14">
           <div>
             <Reveal>
-              <div className="inline-flex items-center gap-2.5 font-mono text-[11px] uppercase tracking-[0.14em] text-bg/55">
-                <span className="h-px w-6 bg-bg/35" />
-                06 — Contact
+              <div className="inline-flex items-center gap-2.5 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-blue">
+                <span className="h-px w-6 bg-blue" />
+                {reviewMode ? "Free website review" : previewMode ? "Free website preview" : "06 — Contact"}
               </div>
             </Reveal>
-            <Reveal as="h2" className="m-0 mt-5 mb-6 text-[clamp(34px,4.4vw,56px)] tracking-[-0.03em] leading-none font-medium text-bg">
-              Let&apos;s map out <br />your <span className="font-serif italic text-accent">next build</span>.
+            <Reveal as="h2" className="m-0 mt-5 mb-6 font-display text-[clamp(2.25rem,4.4vw,3.5rem)] font-black uppercase leading-[0.92] tracking-tighter text-bg">
+              {reviewMode ? (
+                <>
+                  Get a <span className="bg-blue px-2 text-white">free review</span>
+                </>
+              ) : previewMode ? (
+                <>
+                  Get a <span className="bg-blue px-2 text-white">free preview</span>
+                </>
+              ) : (
+                <>
+                  Map out your <span className="bg-blue px-2 text-white">next build</span>
+                </>
+              )}
             </Reveal>
-            <Reveal as="p" className="m-0 max-w-[460px] text-[17px] leading-[1.6] text-bg/70">
-              Have a website, campaign funnel, app idea, or internal workflow that needs an upgrade?
-              Tell Bayline what you&apos;re working on and we&apos;ll respond within one business day.
+            <Reveal as="p" className="m-0 max-w-[460px] font-mono text-[14px] leading-relaxed text-bg/70">
+              {reviewMode
+                ? "Send your website and we'll point out the issues costing trust, speed, and follow-up. No pitch deck, no pressure."
+                : previewMode
+                  ? "Send your business name and what you do. We'll send back a free visual preview of what your first website could look like."
+                : "Have a website, campaign funnel, app idea, or internal workflow that needs an upgrade? Tell Bayline what you're working on and we'll respond within one business day."}
             </Reveal>
 
-            <Reveal className="mt-10 flex flex-col gap-[18px]">
-              <ContactRow label="Email" value={businessConfig.email} />
-              <ContactRow label="Phone" value={businessConfig.phone} />
-              <ContactRow label="Hours" value={businessConfig.hours} />
-              <ContactRow label="Office" value={businessConfig.office} />
-            </Reveal>
+            {!isOfferMode ? (
+              <>
+                <Reveal className="mt-10 flex flex-col gap-[18px]">
+                  <ContactRow label="Email" value={businessConfig.email} />
+                  <ContactRow label="Phone" value={businessConfig.phone} />
+                  <ContactRow label="Hours" value={businessConfig.hours} />
+                  <ContactRow label="Office" value={businessConfig.office} />
+                </Reveal>
 
-            <Reveal className="mt-8">
-              <p className="text-[14.5px] text-bg/60 m-0 leading-relaxed">
-                Prefer to schedule immediately?{" "}
-                <a
-                  href={businessConfig.calendlyUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => trackClientEvent("click_calendly", { location: "contact_sidebar" })}
-                  className="text-accent underline font-medium hover:text-white transition-colors"
-                >
-                  Book a 30-min video call ↗
-                </a>
-              </p>
-            </Reveal>
+                <Reveal className="mt-8">
+                  <p className="text-[14.5px] text-bg/60 m-0 leading-relaxed">
+                    Prefer to schedule immediately?{" "}
+                    <a
+                      href={businessConfig.calendlyUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => trackClientEvent("click_calendly", { location: "contact_sidebar" })}
+                      className="text-blue underline font-bold hover:text-white transition-colors"
+                    >
+                      Book a 30-min video call ↗
+                    </a>
+                  </p>
+                </Reveal>
+              </>
+            ) : null}
           </div>
 
-          <Reveal className="relative rounded-[20px] bg-bg-card p-8 text-ink">
+          <Reveal className="relative border-2 border-ink bg-bg-card p-8 text-ink shadow-[8px_8px_0_0_var(--color-blue)]">
               <form onSubmit={submit} noValidate onFocus={onStart}>
-                <div className="mb-[18px] font-mono text-[11px] text-muted-2">
-                  NEW PROJECT INQUIRY
+                <div className="mb-[18px] font-mono text-[11px] font-bold uppercase tracking-wider text-blue">
+                  {reviewMode ? "WEBSITE REVIEW REQUEST" : previewMode ? "WEBSITE PREVIEW REQUEST" : "NEW PROJECT INQUIRY"}
                   {data.city
                     ? ` · ${data.city.toUpperCase()}`
                     : data.industrySlug && ` · FOR ${data.industrySlug.toUpperCase().replace("-", " ")}`}
@@ -308,28 +363,66 @@ export function Contact({
                   err={touched.name ? errs.name : undefined}
                   placeholder="Your name"
                 />
-                
+
                 <Field
-                  label="Email"
+                  label={isOfferMode ? "Email or phone" : "Email"}
                   id="email"
-                  type="email"
+                  type={isOfferMode ? "text" : "email"}
                   value={data.email}
                   onChange={setField("email")}
                   onBlur={blur("email")}
                   err={touched.email ? errs.email : undefined}
-                  placeholder="you@company.com"
-                />
-                
-                <Field
-                  label="Company"
-                  id="company"
-                  value={data.company}
-                  onChange={setField("company")}
-                  onBlur={blur("company")}
-                  placeholder="Optional"
+                  placeholder={isOfferMode ? "you@company.com or (555) 123-4567" : "you@company.com"}
                 />
 
-                {isLocal && (
+                {reviewMode ? (
+                  <Field
+                    label="Website URL"
+                    id="websiteUrl"
+                    type="url"
+                    value={data.websiteUrl}
+                    onChange={setField("websiteUrl")}
+                    onBlur={blur("websiteUrl")}
+                    err={touched.websiteUrl ? errs.websiteUrl : undefined}
+                    placeholder="https://yourwebsite.com"
+                  />
+                ) : null}
+
+                {previewMode ? (
+                  <>
+                    <Field
+                      label="Business name"
+                      id="company"
+                      value={data.company}
+                      onChange={setField("company")}
+                      onBlur={blur("company")}
+                      err={touched.company ? errs.company : undefined}
+                      placeholder="Your business name"
+                    />
+
+                    <Field
+                      label="What do you do?"
+                      id="details"
+                      textarea
+                      value={data.details}
+                      onChange={setField("details")}
+                      onBlur={blur("details")}
+                      err={touched.details ? errs.details : undefined}
+                      placeholder="A short description of your services, customers, and service area."
+                    />
+                  </>
+                ) : !reviewMode ? (
+                  <Field
+                    label="Company"
+                    id="company"
+                    value={data.company}
+                    onChange={setField("company")}
+                    onBlur={blur("company")}
+                    placeholder="Optional"
+                  />
+                ) : null}
+
+                {isLocal && !isOfferMode && (
                   <>
                     <Field
                       label="City"
@@ -346,7 +439,7 @@ export function Contact({
                           id="service"
                           value={data.service}
                           onChange={setField("service")}
-                          className="flex h-12 w-full rounded-xl border border-line-2 bg-bg px-3.5 py-2.5 text-[14.5px] text-ink focus:border-ink focus:outline-none focus:ring-4 focus:ring-ink/5 transition-[border-color,box-shadow]"
+                          className="flex h-12 w-full border-2 border-ink bg-bg px-3.5 py-2.5 text-[14.5px] text-ink focus:border-blue focus:outline-none focus:ring-2 focus:ring-blue transition-[border-color,box-shadow]"
                         >
                           {SERVICE_OPTIONS.map((opt) => (
                             <option key={opt} value={opt}>
@@ -359,26 +452,28 @@ export function Contact({
                   </>
                 )}
 
-                <div className="mt-4">
-                  <Label>Budget range</Label>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {BUDGETS.map((b) => (
-                      <button
-                        key={b}
-                        type="button"
-                        onClick={() => setData((d) => ({ ...d, budget: b }))}
-                        className={cn(
-                          "rounded-full border px-3.5 py-2 text-[13px] transition-all cursor-pointer",
-                          data.budget === b
-                            ? "border-ink bg-ink text-bg"
-                            : "border-line-2 bg-transparent text-ink-2 hover:border-ink-2"
-                        )}
-                      >
-                        {b}
-                      </button>
-                    ))}
+                {!isOfferMode ? (
+                  <div className="mt-4">
+                    <Label>Budget range</Label>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {BUDGETS.map((b) => (
+                        <button
+                          key={b}
+                          type="button"
+                          onClick={() => setData((d) => ({ ...d, budget: b }))}
+                          className={cn(
+                            "border-2 border-ink px-3.5 py-2 text-[13px] font-bold uppercase tracking-tight transition-all cursor-pointer",
+                            data.budget === b
+                              ? "bg-blue text-white"
+                              : "bg-transparent text-ink-2 hover:bg-bg-sunken"
+                          )}
+                        >
+                          {b}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                ) : null}
 
                 {/* Custom Industry Dynamic Questionnaire Dropdown */}
                 {customDropdownLabel && customDropdownOptions && (
@@ -401,15 +496,17 @@ export function Contact({
                   </div>
                 )}
 
-                <Field
-                  label="Project details (optional)"
-                  id="details"
-                  textarea
-                  value={data.details}
-                  onChange={setField("details")}
-                  onBlur={blur("details")}
-                  placeholder="Optional — a few words about your project, timeline, or what success looks like."
-                />
+                {!isOfferMode ? (
+                  <Field
+                    label="Project details (optional)"
+                    id="details"
+                    textarea
+                    value={data.details}
+                    onChange={setField("details")}
+                    onBlur={blur("details")}
+                    placeholder="Optional — a few words about your project, timeline, or what success looks like."
+                  />
+                ) : null}
 
                 <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
                   <div className="font-mono text-[11px] text-muted-2">
@@ -418,7 +515,7 @@ export function Contact({
                       : `${Object.keys(errs).length} field${Object.keys(errs).length > 1 ? "s" : ""} need attention`}
                   </div>
                   <Button type="submit" disabled={submitting}>
-                    {submitting ? "Sending…" : "Send inquiry"}
+                    {submitting ? "Sending…" : reviewMode ? "Get free review" : previewMode ? "Get free preview" : "Send inquiry"}
                     <span aria-hidden className="inline-flex h-[22px] w-[22px] items-center justify-center rounded-full bg-white/10 ml-2">→</span>
                   </Button>
                 </div>

@@ -19,19 +19,18 @@ export default function NotFound() {
 
           <div className="relative mx-auto grid min-h-[calc(100vh-72px)] w-full max-w-[1280px] grid-cols-1 items-center gap-12 px-8 py-20 lg:grid-cols-[0.92fr_1.08fr]">
             <div>
-              <div className="mb-7 inline-flex items-center gap-2.5 font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
-                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-line bg-bg-card text-blue">
+              <div className="mb-7 inline-flex items-center gap-2.5 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-blue">
+                <span className="inline-flex h-8 w-8 items-center justify-center border-2 border-ink bg-bg-card text-blue">
                   <SearchX size={15} />
                 </span>
                 Page not found
               </div>
 
-              <h1 className="m-0 max-w-[720px] text-[clamp(48px,7vw,94px)] font-medium leading-[0.98] tracking-[-0.045em] text-ink">
-                This route went <br />
-                <span className="font-serif italic text-blue text-[1.04em]">off the map</span>.
+              <h1 className="m-0 max-w-[720px] font-display text-[clamp(3rem,7vw,6rem)] font-black uppercase leading-[0.88] tracking-tighter text-ink">
+                This route went <span className="bg-blue px-2 text-white">off the map</span>
               </h1>
 
-              <p className="mt-7 max-w-[560px] text-[18px] leading-[1.65] text-muted">
+              <p className="mt-7 max-w-[560px] font-mono text-[15px] leading-relaxed text-muted">
                 The page may have moved, been renamed, or never existed. Head back to the landing
                 page and start from the main path.
               </p>
@@ -53,7 +52,7 @@ export default function NotFound() {
             </div>
 
             <div className="relative mx-auto w-full max-w-[540px] lg:mr-0">
-              <div className="relative aspect-square overflow-hidden rounded-[28px] border border-line bg-bg-card shadow-sm">
+              <div className="relative aspect-square overflow-hidden border-2 border-ink bg-bg-card shadow-[10px_10px_0_0_var(--color-blue)]">
                 <div className="absolute inset-0 bg-[linear-gradient(135deg,var(--color-bg-card),var(--color-blue-pale)_58%,var(--color-bg-sunken))]" />
                 <div className="absolute inset-6 rounded-[22px] border border-line/80" />
                 <div className="absolute left-8 right-8 top-8 flex items-center justify-between border-b border-line pb-5 font-mono text-[10px] uppercase tracking-[0.16em] text-muted-2">

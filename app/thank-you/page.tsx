@@ -19,12 +19,12 @@ export default function ThankYouPage() {
       <ThankYouConversion />
       <Nav />
       <main className="flex min-h-[70vh] items-center justify-center px-8 py-32">
-        <Reveal className="mx-auto w-full max-w-[560px] rounded-[24px] border border-line bg-bg-card p-10 text-center shadow-sm md:p-14">
-          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-blue-pale text-[28px] font-semibold text-blue">
+        <Reveal className="mx-auto w-full max-w-[560px] border-2 border-ink bg-bg-card p-10 text-center shadow-[10px_10px_0_0_var(--color-blue)] md:p-14">
+          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center border-2 border-ink bg-blue text-[28px] font-bold text-white">
             ✓
           </div>
-          <h1 className="m-0 text-[clamp(28px,4vw,40px)] font-medium leading-tight tracking-[-0.02em] text-ink">
-            Thanks — your details are <span className="font-serif italic text-blue">in</span>.
+          <h1 className="m-0 font-display text-[clamp(2rem,4vw,3rem)] font-black uppercase leading-none tracking-tighter text-ink">
+            Your details are <span className="bg-blue px-2 text-white">in</span>
           </h1>
           <p className="mx-auto mt-4 max-w-[420px] text-[16px] leading-[1.65] text-muted">
             We received your project details. Bayline Digital will review your request and follow up

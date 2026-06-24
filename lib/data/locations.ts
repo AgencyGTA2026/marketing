@@ -158,9 +158,9 @@ export const LOCATIONS_DATA: Record<string, LocationData> = {
     metaDescription:
       "Modern websites, local SEO, landing pages, and automation systems for Vaughan businesses. Book a free website audit with Bayline Digital.",
     heroBadge: "Vaughan Local Business Growth",
-    heroHeadline: "Web Design, SEO, and Automation for Vaughan Businesses",
+    heroHeadline: "Vaughan businesses lose leads to slow, dated, untrustworthy websites",
     heroSub:
-      "Bayline Digital builds fast websites, campaign-ready landing pages, local SEO systems, and workflow automations for growing businesses in Vaughan.",
+      "If your site loads slowly, looks out of date, or sends leads into an inbox nobody answers fast, people move on before they trust you.",
     introCopy:
       "Bayline Digital helps Vaughan businesses build clearer websites, stronger local landing pages, and better digital systems. Whether you need a redesign, local SEO, workflow automation, or a custom web app, the goal is the same: make your business easier to find, trust, and contact.",
     localAngleCopy:
@@ -177,9 +177,9 @@ export const LOCATIONS_DATA: Record<string, LocationData> = {
     metaDescription:
       "Fast websites, campaign landing pages, local SEO, and business automation for Whitby companies. Start with a free website review.",
     heroBadge: "Whitby Local Business Growth",
-    heroHeadline: "Web Design, SEO, and Automation for Whitby Businesses",
+    heroHeadline: "Whitby businesses lose leads to slow, dated, untrustworthy websites",
     heroSub:
-      "Bayline Digital builds polished websites, campaign-ready landing pages, local SEO systems, and simple automations for growing businesses in Whitby.",
+      "If your site loads slowly, looks out of date, or sends leads into an inbox nobody answers fast, people move on before they trust you.",
     introCopy:
       "Bayline Digital helps Whitby businesses build clearer websites, stronger local landing pages, and better digital systems. Whether you need a redesign, local SEO, workflow automation, or a custom web app, the goal is the same: make your business easier to find, trust, and contact.",
     localAngleCopy:
@@ -196,9 +196,9 @@ export const LOCATIONS_DATA: Record<string, LocationData> = {
     metaDescription:
       "Bayline Digital builds modern websites, local SEO pages, and workflow systems for Pickering businesses. Book a free audit.",
     heroBadge: "Pickering Local Business Growth",
-    heroHeadline: "Web Design, SEO, and Automation for Pickering Businesses",
+    heroHeadline: "Pickering businesses lose leads to slow, dated, untrustworthy websites",
     heroSub:
-      "Bayline Digital builds fast websites, conversion-focused landing pages, local SEO systems, and workflow automations for growing businesses in Pickering.",
+      "If your site loads slowly, looks out of date, or sends leads into an inbox nobody answers fast, people move on before they trust you.",
     introCopy:
       "Bayline Digital helps Pickering businesses build clearer websites, stronger local landing pages, and better digital systems. Whether you need a redesign, local SEO, workflow automation, or a custom web app, the goal is the same: make your business easier to find, trust, and contact.",
     localAngleCopy:
@@ -215,9 +215,9 @@ export const LOCATIONS_DATA: Record<string, LocationData> = {
     metaDescription:
       "Custom websites, landing pages, local SEO, and automation systems for Ottawa businesses. Plan your next digital build.",
     heroBadge: "Ottawa Local Business Growth",
-    heroHeadline: "Web Design, SEO, and Automation for Ottawa Businesses",
+    heroHeadline: "Ottawa businesses lose leads to slow, dated, untrustworthy websites",
     heroSub:
-      "Bayline Digital builds custom websites, campaign-ready landing pages, local SEO systems, and clean automation workflows for Ottawa businesses.",
+      "If your site loads slowly, looks out of date, or sends leads into an inbox nobody answers fast, people move on before they trust you.",
     introCopy:
       "Bayline Digital helps Ottawa businesses build clearer websites, stronger local landing pages, and better digital systems. Whether you need a redesign, local SEO, workflow automation, or a custom web app, the goal is the same: make your business easier to find, trust, and contact.",
     localAngleCopy:
@@ -234,9 +234,9 @@ export const LOCATIONS_DATA: Record<string, LocationData> = {
     metaDescription:
       "Website redesigns, local SEO, custom apps, and automation systems for Oshawa businesses. Request a free review.",
     heroBadge: "Oshawa Local Business Growth",
-    heroHeadline: "Web Design, SEO, and Automation for Oshawa Businesses",
+    heroHeadline: "Oshawa businesses lose leads to slow, dated, untrustworthy websites",
     heroSub:
-      "Bayline Digital builds fast websites, website redesigns, local SEO systems, custom apps, and workflow automations for Oshawa businesses.",
+      "If your site loads slowly, looks out of date, or sends leads into an inbox nobody answers fast, people move on before they trust you.",
     introCopy:
       "Bayline Digital helps Oshawa businesses build clearer websites, stronger local landing pages, and better digital systems. Whether you need a redesign, local SEO, workflow automation, or a custom web app, the goal is the same: make your business easier to find, trust, and contact.",
     localAngleCopy:
@@ -253,9 +253,9 @@ export const LOCATIONS_DATA: Record<string, LocationData> = {
     metaDescription:
       "Modern websites, campaign landing pages, hosting, local SEO, and automation support for Ajax businesses. Contact Bayline Digital.",
     heroBadge: "Ajax Local Business Growth",
-    heroHeadline: "Web Design, SEO, and Automation for Ajax Businesses",
+    heroHeadline: "Ajax businesses lose leads to slow, dated, untrustworthy websites",
     heroSub:
-      "Bayline Digital builds modern websites, campaign landing pages, local SEO systems, hosting, and ongoing support for Ajax businesses.",
+      "If your site loads slowly, looks out of date, or sends leads into an inbox nobody answers fast, people move on before they trust you.",
     introCopy:
       "Bayline Digital helps Ajax businesses build clearer websites, stronger local landing pages, and better digital systems. Whether you need a redesign, local SEO, workflow automation, or a custom web app, the goal is the same: make your business easier to find, trust, and contact.",
     localAngleCopy:

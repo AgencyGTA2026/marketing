@@ -27,7 +27,7 @@ export default async function BlogPostPage({ params }: Props) {
       <Nav />
       <main className="bg-bg">
         <article>
-          <header className="border-b border-line bg-bg pt-16 pb-12">
+          <header className="border-b-4 border-ink bg-bg pt-16 pb-12">
             <div className="mx-auto w-full max-w-[1040px] px-8">
               <Link
                 href="/blog"
@@ -38,7 +38,7 @@ export default async function BlogPostPage({ params }: Props) {
               </Link>
 
               <BlogMeta post={post} />
-              <h1 className="mt-6 mb-0 max-w-[940px] text-[clamp(40px,5vw,72px)] font-medium leading-[1.05] tracking-[-0.035em] text-ink">
+              <h1 className="mt-6 mb-0 max-w-[940px] font-display text-[clamp(2.25rem,5vw,4.5rem)] font-black uppercase leading-[0.95] tracking-tighter text-ink">
                 {post.title}
               </h1>
               {post.excerpt && (
@@ -49,12 +49,12 @@ export default async function BlogPostPage({ params }: Props) {
           </header>
 
           {heroImage && (
-            <div className="border-b border-line bg-bg-sunken">
+            <div className="border-b-4 border-ink bg-bg-sunken">
               <div className="mx-auto w-full max-w-[1160px] px-8 py-10">
                 <img
                   src={heroImage}
                   alt=""
-                  className="aspect-[16/9] w-full rounded-[22px] border border-line object-cover shadow-sm"
+                  className="aspect-[16/9] w-full border border-line object-cover"
                 />
               </div>
             </div>
@@ -74,7 +74,7 @@ export default async function BlogPostPage({ params }: Props) {
               </div>
 
               <aside className="lg:pt-2">
-                <div className="sticky top-24 rounded-[20px] border border-line bg-bg-card p-6 shadow-sm">
+                <div className="sticky top-24 border-2 border-ink bg-bg-card p-6">
                   <div className="font-mono text-[10.5px] uppercase tracking-[0.12em] text-muted-2">Article</div>
                   <dl className="mt-5 space-y-4">
                     <div>
@@ -132,7 +132,7 @@ function CategoryList({ categories }: { categories?: string[] }) {
       {categories.map((category) => (
         <span
           key={category}
-          className="rounded-full border border-blue-pale bg-blue-pale/45 px-3 py-1.5 font-mono text-[10.5px] font-medium text-blue"
+          className="border-2 border-ink bg-blue px-3 py-1.5 font-mono text-[10.5px] font-bold uppercase text-white"
         >
           {category}
         </span>
@@ -145,12 +145,12 @@ function FaqSection({ post }: { post: BlogPost }) {
   if (!post.faq?.items.length) return null;
 
   return (
-    <section className="mt-16 border-t border-line pt-12">
+    <section className="mt-16 border-t-2 border-ink pt-12">
       <div className="font-mono text-[10.5px] uppercase tracking-[0.12em] text-muted-2">FAQ</div>
       <h2 className="mt-3 mb-8 text-[30px] font-medium tracking-[-0.02em] text-ink">Common questions</h2>
       <div className="space-y-4">
         {post.faq.items.map((item) => (
-          <details key={item.question} className="group rounded-[18px] border border-line bg-bg-card p-5">
+          <details key={item.question} className="group border-2 border-ink bg-bg-card p-5">
             <summary className="cursor-pointer list-none text-[17px] font-medium text-ink marker:hidden">
               <span className="flex items-center justify-between gap-4">
                 {item.question}
@@ -169,7 +169,7 @@ function RelatedPosts({ posts }: { posts?: RelatedPostSummary[] }) {
   if (!posts?.length) return null;
 
   return (
-    <section className="border-t border-line bg-bg-sunken py-20">
+    <section className="border-t-4 border-ink bg-bg-sunken py-20">
       <div className="mx-auto w-full max-w-[1160px] px-8">
         <div className="mb-8 flex items-end justify-between gap-6">
           <div>
@@ -182,7 +182,7 @@ function RelatedPosts({ posts }: { posts?: RelatedPostSummary[] }) {
             <Link
               key={post.id}
               href={`/blog/${post.slug}`}
-              className="group rounded-[18px] border border-line bg-bg-card p-6 shadow-sm transition-all duration-300 hover:-translate-y-[2px] hover:shadow-md"
+              className="group border-2 border-ink bg-bg-card p-6 transition-all duration-300 hover:-translate-y-[2px]"
             >
               <div className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted-2">
                 {formatDate(post.publishedAt ?? post.updatedAt)}

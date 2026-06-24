@@ -35,15 +35,19 @@ export function Process() {
   const step = STEPS[active];
 
   return (
-    <section id="process" className="py-32">
-      <div className="mx-auto w-full max-w-[1280px] px-8">
+    <section id="process" className="border-t-4 border-ink bg-bg px-5 py-24 sm:px-8">
+      <div className="mx-auto w-full max-w-[1280px]">
         <SectionHeader
           eyebrow="04 — Process"
-          title={<>A simple <span className="font-serif italic text-blue">four-step</span> way of working.</>}
-          sub="Most projects ship in four to six weeks. You always know what's happening this week, what's next, and what's blocking — nothing more, nothing less."
+          title={
+            <>
+              Four steps. <span className="bg-blue px-2 text-white">No drama</span>
+            </>
+          }
+          sub="Most projects ship in four to six weeks. You always know what's happening this week, what's next, and what's blocking — nothing more."
         />
 
-        <div className="mt-16 grid grid-cols-1 gap-14 items-start md:grid-cols-[1fr_1.1fr]">
+        <div className="mt-14 grid grid-cols-1 border-2 border-ink md:grid-cols-[1fr_1.1fr]">
           <div className="flex flex-col">
             {STEPS.map((s, i) => (
               <button
@@ -51,37 +55,46 @@ export function Process() {
                 onMouseEnter={() => setActive(i)}
                 onFocus={() => setActive(i)}
                 onClick={() => setActive(i)}
-                className="grid cursor-pointer grid-cols-[48px_1fr_auto] items-center gap-4 border-t border-line py-5 text-left last:border-b last:border-line"
+                className={`grid cursor-pointer grid-cols-[48px_1fr_auto] items-center gap-4 border-b-2 border-ink px-6 py-6 text-left transition-colors last:border-b-0 ${
+                  active === i ? "bg-ink text-bg" : "bg-bg-card text-ink hover:bg-bg-sunken"
+                }`}
               >
-                <span className={`font-mono text-[12px] transition-colors ${active === i ? "text-ink" : "text-muted-2"}`}>
-                  0{i + 1}
-                </span>
-                <span className={`text-[24px] font-medium tracking-[-0.02em] transition-colors ${active === i ? "text-ink" : "text-muted"}`}>
-                  {s.k}
-                </span>
-                <span className={`font-mono text-[11px] text-muted-2 rounded-full border border-line px-2.5 py-1 ${active === i ? "bg-bg-card" : "bg-transparent"}`}>
+                <span className="font-mono text-sm font-bold">0{i + 1}</span>
+                <span className="font-display text-2xl font-black uppercase tracking-tight">{s.k}</span>
+                <span
+                  className={`border-2 px-2.5 py-1 font-mono text-[11px] font-bold uppercase ${
+                    active === i ? "border-bg text-bg" : "border-ink text-muted"
+                  }`}
+                >
                   {s.w}
                 </span>
               </button>
             ))}
           </div>
 
-          <div className="sticky top-24 min-h-[380px] rounded-[20px] border border-line bg-bg-card p-9 shadow-sm">
-            <div className="font-mono text-[11px] text-muted-2 mb-4">
-              STEP 0{active + 1} OF 04 · {step.w.toUpperCase()}
+          <div className="border-t-2 border-ink bg-blue p-9 text-white md:border-t-0 md:border-l-2">
+            <div className="font-mono text-[11px] font-bold uppercase tracking-widest text-white/70">
+              Step 0{active + 1} of 04 · {step.w}
             </div>
-            <h3 className="m-0 text-[38px] leading-[1.05] tracking-[-0.03em] font-medium">{step.k}</h3>
-            <p className="mt-4 text-[17px] leading-[1.55] text-muted">{step.d}</p>
+            <div>
+              <h3 className="mt-4 font-display text-[clamp(2rem,4vw,3rem)] font-black uppercase leading-none tracking-tighter">
+                {step.k}
+              </h3>
+              <p className="mt-4 max-w-md text-[15px] font-medium leading-relaxed text-white/90">{step.d}</p>
 
-            <div className="mt-7 border-t border-line pt-5">
-              <div className="font-mono text-[11px] text-muted-2 mb-3">YOU&apos;LL GET</div>
-              <ul className="m-0 flex list-none flex-col gap-2 p-0">
-                {step.deliverables.map((b) => (
-                  <li key={b} className="flex gap-2.5 text-[14px] text-ink-2">
-                    <span className="text-blue">—</span>{b}
-                  </li>
-                ))}
-              </ul>
+              <div className="mt-7 border-t-2 border-white/30 pt-5">
+                <div className="mb-3 font-mono text-[11px] font-bold uppercase tracking-widest text-white/70">
+                  You&apos;ll get
+                </div>
+                <ul className="m-0 flex list-none flex-col gap-2 p-0">
+                  {step.deliverables.map((b) => (
+                    <li key={b} className="flex gap-2.5 text-sm font-bold uppercase tracking-tight">
+                      <span>—</span>
+                      {b}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </div>
         </div>
