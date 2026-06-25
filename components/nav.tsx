@@ -16,10 +16,10 @@ export function Nav() {
 
   const links = [
     ["Home", isHome ? "#top" : "/"],
-    ["Services", isHome ? "#services" : "/services"],
+    ["What's included", isHome ? "#included" : "/#included"],
+    ["Why Bayline", isHome ? "#why" : "/#why"],
+    ["Services", "/services"],
     ["Blog", "/blog"],
-    ["Process", isHome ? "#process" : "/#process"],
-    ["About", isHome ? "#about" : "/#about"],
   ] as const;
 
   useEffect(() => {
@@ -50,7 +50,7 @@ export function Nav() {
         <div className="flex items-center gap-3">
           <Button asChild size="sm" className="h-10 px-4 text-sm">
             <Link href={isHome ? "#contact" : "/contact"}>
-              Contact
+              Book a call
               <span aria-hidden className="text-base leading-none -translate-y-px">↗</span>
             </Link>
           </Button>

@@ -21,6 +21,12 @@ export type LocationData = {
   localAngleCopy: string;
   trustBlockCopy: string;
   faqs: LocationFaq[];
+  /** Nearby towns/neighbourhoods woven into the hero "now booking" pill. */
+  neighbors: string;
+  /** Live social-proof line shown under the hero. */
+  recentActivity: string;
+  /** True for region-level pages (e.g. Durham Region) that span multiple cities. */
+  isRegion?: boolean;
 };
 
 // The six ad groups. anchorId values are referenced directly from Google Ads
@@ -119,37 +125,70 @@ export const SERVICE_SECTIONS: ServiceSection[] = [
 // Service names for the contact form select. Kept in sync with SERVICE_SECTIONS.
 export const SERVICE_OPTIONS = SERVICE_SECTIONS.map((s) => s.serviceName);
 
-// Shared FAQ base (PRD §15) with {City} interpolated per location.
-function baseFaqs(city: string): LocationFaq[] {
+// Builds a genuinely city-specific FAQ set (weaving in each location's
+// neighbours, province, and region/city context) so every location page has
+// unique visible FAQ copy AND a unique FAQPage JSON-LD block — avoiding the
+// thin/duplicate-content problem of a single shared template.
+function cityFaqs(loc: Pick<LocationData, "cityName" | "neighbors" | "province" | "isRegion">): LocationFaq[] {
+  const { cityName: name, neighbors, province, isRegion } = loc;
+  const provinceName = province === "ON" ? "Ontario" : province;
+
   return [
     {
-      question: `Do you work with businesses in ${city}?`,
-      answer: `Yes. Bayline Digital works with businesses in ${city} and across Ontario through a remote-friendly process.`,
+      question: isRegion
+        ? `Do you build websites for businesses across ${name}?`
+        : `Do you build websites for businesses in ${name}?`,
+      answer: isRegion
+        ? `Yes. Bayline Digital builds websites for businesses across ${name} — including ${neighbors} — and throughout ${provinceName} through a remote-friendly process.`
+        : `Yes. Bayline Digital works with ${name} businesses and nearby communities like ${neighbors}, plus the wider ${provinceName} area, through a remote-friendly process.`,
     },
     {
-      question: "Can you build a landing page just for my Google Ads campaign?",
-      answer:
-        "Yes. We can build focused landing pages for specific cities, services, or offers, with tracking wired in from day one.",
+      question: `Can you help my ${name} business rank on Google and Google Maps?`,
+      answer: `Yes. We set up your Google Business Profile, add local schema, and build location-focused pages so customers ${
+        isRegion ? `across ${name}` : `in ${name}`
+      } can find you in local search and Google Maps results.`,
     },
     {
-      question: "Can you redesign my current website instead of starting from scratch?",
-      answer:
-        "Yes. We can review your current site, keep what works, and rebuild the parts that need better design, speed, clarity, or tracking.",
+      question: `Can you build a landing page for my ${name} Google Ads campaign?`,
+      answer: `Yes. We build focused ${name} landing pages for specific services, neighbourhoods, or offers, with conversion tracking wired in from day one so you can see which ${name} searches turn into calls.`,
     },
     {
-      question: "Do you help with Google Ads tracking?",
-      answer:
-        "Yes. We can add form tracking, UTM capture, phone-click tracking, and booking-click tracking so you know exactly where leads come from.",
+      question: `Can you redesign my current ${name} website instead of starting over?`,
+      answer: `Yes. We review your existing site, keep what already works, and rebuild the parts that need better design, speed, clarity, or tracking — without losing the search visibility your ${name} business has already earned.`,
     },
     {
-      question: "Do you offer ongoing website support?",
-      answer:
-        "Yes. Bayline offers hosting, maintenance, updates, and support after launch on a simple monthly plan.",
+      question: `How long does a new ${name} website take, and do I own it?`,
+      answer: `Most builds ship in about four to six weeks. You own the website outright — the custom code, content, and hosting setup are all yours, with no templates and no vendor lock-in.`,
+    },
+    {
+      question: `Do you offer ongoing website support after launch?`,
+      answer: `Yes. Bayline offers hosting, maintenance, updates, and support for ${name} businesses after launch on a simple monthly plan, so your site stays fast, secure, and current.`,
     },
   ];
 }
 
-export const LOCATIONS_DATA: Record<string, LocationData> = {
+const LOCATIONS_BASE: Record<string, Omit<LocationData, "faqs">> = {
+  "durham-region": {
+    citySlug: "durham-region",
+    cityName: "Durham Region",
+    province: "ON",
+    isRegion: true,
+    neighbors: "Whitby, Oshawa, Ajax, Pickering & Clarington",
+    recentActivity: "A home-services business in Durham Region booked a call last week",
+    metaTitle: "Web Design & Automation in Durham Region | Bayline Digital",
+    metaDescription:
+      "Lead-ready websites, local SEO, landing pages, and automation for businesses across Durham Region — Whitby, Oshawa, Ajax, Pickering & Clarington. Book a free intro call.",
+    heroBadge: "Durham Region Local Business Growth",
+    heroHeadline: "Web Design, SEO, and Automation for Durham Region Businesses",
+    heroSub:
+      "Bayline Digital builds custom, lead-ready websites, campaign-ready landing pages, local SEO systems, and workflow automations for service businesses across Durham Region.",
+    introCopy:
+      "Bayline Digital helps Durham Region businesses build clearer websites, stronger local landing pages, and better digital systems. Whether you need a redesign, local SEO, workflow automation, or a custom web app, the goal is the same: make your business easier to find, trust, and contact across Whitby, Oshawa, Ajax, Pickering, and Clarington.",
+    localAngleCopy:
+      "We work with home-service companies, trades, clinics, and local teams across Durham Region that need polished websites, faster lead response, and simple systems that do not create extra admin work.",
+    trustBlockCopy:
+      "Durham Region businesses compete across a wide area — from Pickering to Clarington — so your website needs to look credible, load fast, and make the next step obvious in every town you serve. Bayline builds local landing pages, modern websites, and simple automation that help teams respond faster and convert more inquiries.",
+  },
   vaughan: {
     citySlug: "vaughan",
     cityName: "Vaughan",
@@ -167,7 +206,8 @@ export const LOCATIONS_DATA: Record<string, LocationData> = {
       "We work with competitive GTA businesses, professional services, clinics, home service companies, consultants, and growing local teams.",
     trustBlockCopy:
       "For Vaughan businesses competing across the GTA, your website needs to look credible, load quickly, and make the next step obvious. Bayline helps local service companies, clinics, trades, consultants, and growing teams turn their website into a clearer sales asset.",
-    faqs: baseFaqs("Vaughan"),
+    neighbors: "Woodbridge, Maple & Concord",
+    recentActivity: "A home-services business in Vaughan booked a call last week",
   },
   whitby: {
     citySlug: "whitby",
@@ -186,7 +226,8 @@ export const LOCATIONS_DATA: Record<string, LocationData> = {
       "We work with Durham Region businesses that need polished websites, faster lead response, and simple systems that do not create extra admin work.",
     trustBlockCopy:
       "Whitby businesses need digital systems that feel polished without becoming complicated. Bayline builds local landing pages, modern websites, and simple automation systems that help teams respond faster and convert more inquiries.",
-    faqs: baseFaqs("Whitby"),
+    neighbors: "Brooklin & Ashburn",
+    recentActivity: "A café near downtown Whitby booked a call last week",
   },
   pickering: {
     citySlug: "pickering",
@@ -205,7 +246,8 @@ export const LOCATIONS_DATA: Record<string, LocationData> = {
       "We work with East GTA businesses that want a sharper online presence, clearer service pages, and conversion-focused landing pages.",
     trustBlockCopy:
       "Pickering businesses competing across the East GTA need a website that loads fast, reads clearly, and makes the next step obvious. Bayline helps local teams turn a sharper online presence into more qualified inquiries.",
-    faqs: baseFaqs("Pickering"),
+    neighbors: "Ajax & Bay Ridges",
+    recentActivity: "A clinic in Pickering booked a call last week",
   },
   ottawa: {
     citySlug: "ottawa",
@@ -224,7 +266,8 @@ export const LOCATIONS_DATA: Record<string, LocationData> = {
       "We work with established businesses, service companies, consultants, and organizations that need clean digital systems and a professional web presence.",
     trustBlockCopy:
       "Ottawa businesses and organizations need a professional web presence backed by clean systems. Bayline builds modern websites, local landing pages, and automation that make established teams easier to find and quicker to respond.",
-    faqs: baseFaqs("Ottawa"),
+    neighbors: "Kanata, Nepean & Orléans",
+    recentActivity: "A service business in Ottawa booked a call last week",
   },
   oshawa: {
     citySlug: "oshawa",
@@ -243,7 +286,8 @@ export const LOCATIONS_DATA: Record<string, LocationData> = {
       "We work with local service businesses, trades, clinics, and operational teams that need better websites and workflow tools.",
     trustBlockCopy:
       "Oshawa service businesses, trades, and operational teams need websites and workflow tools that actually make the day easier. Bayline builds practical digital systems that help teams look credible and respond faster.",
-    faqs: baseFaqs("Oshawa"),
+    neighbors: "Courtice & Taunton",
+    recentActivity: "A contractor in north Oshawa booked a call last week",
   },
   ajax: {
     citySlug: "ajax",
@@ -262,6 +306,12 @@ export const LOCATIONS_DATA: Record<string, LocationData> = {
       "We work with small businesses, contractors, clinics, and service teams that need modern web design, local SEO, and ongoing support.",
     trustBlockCopy:
       "Ajax small businesses, contractors, and service teams need a modern website and dependable support without the agency overhead. Bayline builds clean sites, local SEO, and ongoing maintenance that keep you visible and easy to contact.",
-    faqs: baseFaqs("Ajax"),
+    neighbors: "Pickering & Audley",
+    recentActivity: "A clinic near the Ajax waterfront booked a call last week",
   },
 };
+
+// Attach a unique, city-specific FAQ set to every location from its own fields.
+export const LOCATIONS_DATA: Record<string, LocationData> = Object.fromEntries(
+  Object.entries(LOCATIONS_BASE).map(([slug, loc]) => [slug, { ...loc, faqs: cityFaqs(loc) }]),
+);

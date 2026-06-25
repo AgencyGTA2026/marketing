@@ -4,7 +4,8 @@ import Link from "next/link";
 import { LOCATIONS_DATA, SERVICE_SECTIONS } from "@/lib/data/locations";
 import { businessConfig } from "@/lib/data/business";
 import { Nav } from "@/components/nav";
-import { Hero } from "@/components/hero";
+import { LandingHero } from "@/components/landing-hero";
+import { WhyBayline } from "@/components/why-bayline";
 import { Contact } from "@/components/contact";
 import { Footer } from "@/components/footer";
 import { Reveal } from "@/components/reveal";
@@ -93,13 +94,12 @@ export default async function LocationLandingPage({ params }: PageProps) {
     ],
   };
 
-  const heroHeadline = (
-    <>
-      Web Design, SEO, and Automation
-      <br />
-      for <span className="font-serif italic text-blue">{cityName}</span> Businesses
-    </>
-  );
+  const heroEyebrow = location.isRegion
+    ? `Now booking across ${cityName} · 2026`
+    : `Now booking in ${cityName}, ${location.province} · 2026`;
+  const heroLocalLine = location.isRegion
+    ? `Now booking across ${location.neighbors}.`
+    : `Now booking in ${cityName}, ${location.neighbors} & nearby.`;
 
   return (
     <>
@@ -110,10 +110,13 @@ export default async function LocationLandingPage({ params }: PageProps) {
       <LocationPageView city={cityName} />
       <Nav />
       <main className="pb-16 md:pb-0">
-        <Hero
-          badge={location.heroBadge}
-          headline={heroHeadline}
-          subheadline={location.heroSub}
+        <LandingHero
+          eyebrow={heroEyebrow}
+          placeName={cityName}
+          localLine={heroLocalLine}
+          recentActivity={location.recentActivity}
+          city={cityName}
+          pageType="location"
         />
 
         {/* City-specific trust block */}
@@ -178,6 +181,8 @@ export default async function LocationLandingPage({ params }: PageProps) {
             </div>
           </div>
         </section>
+
+        <WhyBayline />
 
         {/* FAQ */}
         <section className="py-24 border-t border-line bg-bg-sunken">
