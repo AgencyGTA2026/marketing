@@ -10,6 +10,12 @@ import { trackClientEvent } from "@/lib/analytics";
 export function ThankYouConversion() {
   useEffect(() => {
     if (typeof window === "undefined") return;
+    try {
+      if (sessionStorage.getItem("bayline_confirmed_lead") !== "1") return;
+      sessionStorage.removeItem("bayline_confirmed_lead");
+    } catch {
+      return;
+    }
     const params = new URLSearchParams(window.location.search);
     const payload = {
       city: params.get("city") || undefined,

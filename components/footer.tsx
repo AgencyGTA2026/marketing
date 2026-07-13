@@ -1,96 +1,37 @@
 "use client";
 
-import { Logo } from "./logo";
 import Link from "next/link";
-import { businessConfig } from "@/lib/data/business";
+import { Logo } from "./logo";
+import { businessConfig, primaryNavigation, serviceNavigation } from "@/lib/data/business";
 import { trackClientEvent } from "@/lib/analytics";
-
-const COLS = [
-  {
-    title: "Services",
-    links: [
-      { label: "Custom CMS Websites", href: "/services/custom-websites" },
-      { label: "Landing Pages", href: "/services/landing-pages" },
-      { label: "Inventory & Web Apps", href: "/services/web-apps" },
-      { label: "Lead Automation", href: "/services/automation" },
-      { label: "Automated & Local SEO", href: "/services/seo" },
-      { label: "Monthly Support & Hosting", href: "/services/maintenance" },
-    ],
-  },
-  {
-    title: "Industries",
-    links: [
-      { label: "B2B Enterprise", href: "/industries/b2b-enterprises" },
-      { label: "SEO Marketing", href: "/industries/marketing-firms" },
-      { label: "Home Services", href: "/industries/home-services" },
-    ],
-  },
-  {
-    title: "Studio",
-    links: [
-      { label: "About", href: "/#about" },
-      { label: "Blog", href: "/blog" },
-      { label: "Process", href: "/#process" },
-      { label: "Contact", href: "/contact" },
-      { label: "Book Intro Call ↗", href: businessConfig.calendlyUrl },
-    ],
-  },
-];
 
 export function Footer() {
   return (
-    <footer className="border-t border-line px-0 pb-9 pt-14 bg-bg">
-      <div className="mx-auto w-full max-w-[1280px] px-8">
-        <div className="grid grid-cols-1 gap-10 pb-10 sm:grid-cols-2 md:grid-cols-5 md:[&>:first-child]:col-span-1">
-          <div>
-            <Link href="/" aria-label="Bayline Digital home">
-              <Logo />
-            </Link>
-            <p className="mt-4 max-w-[280px] text-[14px] leading-[1.55] text-muted">
-              Bayline Digital builds modern websites, conversion-focused funnels, and custom workflow systems for teams that care about clarity, speed, and dependable execution.
-            </p>
-          </div>
-          {COLS.map((c) => (
-            <div key={c.title}>
-              <div className="mb-3.5 font-mono text-[11px] uppercase tracking-[0.12em] text-muted-2">
-                {c.title}
-              </div>
-              <ul className="m-0 flex list-none flex-col gap-2.5 p-0">
-                {c.links.map((l) => {
-                  const isExternal = l.href.startsWith("http");
-                  return (
-                    <li key={l.label}>
-                      {isExternal ? (
-                        <a
-                          href={l.href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={() => {
-                            if (l.href === businessConfig.calendlyUrl) {
-                              trackClientEvent("click_calendly", { location: "footer" });
-                            }
-                          }}
-                          className="text-[14px] text-ink-2 transition-colors hover:text-blue"
-                        >
-                          {l.label}
-                        </a>
-                      ) : (
-                        <Link href={l.href} className="text-[14px] text-ink-2 transition-colors hover:text-blue">
-                          {l.label}
-                        </Link>
-                      )}
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          ))}
+    <footer className="site-footer">
+      <div className="wrap footer-main">
+        <div className="footer-brand">
+          <Link href="/" aria-label="Bayline Digital home"><Logo /></Link>
+          <p>Clear websites and practical digital systems for growing businesses.</p>
         </div>
-
-        <div className="flex flex-wrap justify-between gap-3 border-t border-line pt-6 text-[12px] text-muted-2">
-          <span className="font-mono">© 2026 BAYLINE DIGITAL INC. · TORONTO, ON</span>
-          <span className="font-mono">DESIGNED &amp; ENGINEERED IN-HOUSE</span>
+        <div className="footer-column">
+          <span>Explore</span>
+          {primaryNavigation.map((link) => <Link key={link.href} href={link.href}>{link.label}</Link>)}
+          <Link href="/contact">Contact</Link>
         </div>
+        <div className="footer-column footer-services">
+          <span>Services</span>
+          {serviceNavigation.map((link) => <Link key={link.href} href={link.href}>{link.label}</Link>)}
+        </div>
+        <div className="footer-column">
+          <span>Contact</span>
+          <a href={`mailto:${businessConfig.email}`} onClick={() => trackClientEvent("email_click", { location: "footer" })}>{businessConfig.email}</a>
+          <a href={`tel:${businessConfig.phone.replace(/[^\d+]/g, "")}`} onClick={() => trackClientEvent("phone_click", { location: "footer" })}>{businessConfig.phone}</a>
+          <p>{businessConfig.office}</p>
+        </div>
+      </div>
+      <div className="wrap footer-bottom">
+        <span>© {new Date().getFullYear()} {businessConfig.name}</span>
+        <span>Designed and engineered in-house</span>
       </div>
     </footer>
   );

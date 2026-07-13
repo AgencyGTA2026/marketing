@@ -23,8 +23,6 @@ export type LocationData = {
   faqs: LocationFaq[];
   /** Nearby towns/neighbourhoods woven into the hero "now booking" pill. */
   neighbors: string;
-  /** Live social-proof line shown under the hero. */
-  recentActivity: string;
   /** True for region-level pages (e.g. Durham Region) that span multiple cities. */
   isRegion?: boolean;
 };
@@ -174,7 +172,6 @@ const LOCATIONS_BASE: Record<string, Omit<LocationData, "faqs">> = {
     province: "ON",
     isRegion: true,
     neighbors: "Whitby, Oshawa, Ajax, Pickering & Clarington",
-    recentActivity: "A home-services business in Durham Region booked a call last week",
     metaTitle: "Web Design & Automation in Durham Region | Bayline Digital",
     metaDescription:
       "Lead-ready websites, local SEO, landing pages, and automation for businesses across Durham Region — Whitby, Oshawa, Ajax, Pickering & Clarington. Book a free intro call.",
@@ -207,7 +204,6 @@ const LOCATIONS_BASE: Record<string, Omit<LocationData, "faqs">> = {
     trustBlockCopy:
       "For Vaughan businesses competing across the GTA, your website needs to look credible, load quickly, and make the next step obvious. Bayline helps local service companies, clinics, trades, consultants, and growing teams turn their website into a clearer sales asset.",
     neighbors: "Woodbridge, Maple & Concord",
-    recentActivity: "A home-services business in Vaughan booked a call last week",
   },
   whitby: {
     citySlug: "whitby",
@@ -227,7 +223,6 @@ const LOCATIONS_BASE: Record<string, Omit<LocationData, "faqs">> = {
     trustBlockCopy:
       "Whitby businesses need digital systems that feel polished without becoming complicated. Bayline builds local landing pages, modern websites, and simple automation systems that help teams respond faster and convert more inquiries.",
     neighbors: "Brooklin & Ashburn",
-    recentActivity: "A café near downtown Whitby booked a call last week",
   },
   pickering: {
     citySlug: "pickering",
@@ -247,7 +242,6 @@ const LOCATIONS_BASE: Record<string, Omit<LocationData, "faqs">> = {
     trustBlockCopy:
       "Pickering businesses competing across the East GTA need a website that loads fast, reads clearly, and makes the next step obvious. Bayline helps local teams turn a sharper online presence into more qualified inquiries.",
     neighbors: "Ajax & Bay Ridges",
-    recentActivity: "A clinic in Pickering booked a call last week",
   },
   ottawa: {
     citySlug: "ottawa",
@@ -267,7 +261,6 @@ const LOCATIONS_BASE: Record<string, Omit<LocationData, "faqs">> = {
     trustBlockCopy:
       "Ottawa businesses and organizations need a professional web presence backed by clean systems. Bayline builds modern websites, local landing pages, and automation that make established teams easier to find and quicker to respond.",
     neighbors: "Kanata, Nepean & Orléans",
-    recentActivity: "A service business in Ottawa booked a call last week",
   },
   oshawa: {
     citySlug: "oshawa",
@@ -287,7 +280,6 @@ const LOCATIONS_BASE: Record<string, Omit<LocationData, "faqs">> = {
     trustBlockCopy:
       "Oshawa service businesses, trades, and operational teams need websites and workflow tools that actually make the day easier. Bayline builds practical digital systems that help teams look credible and respond faster.",
     neighbors: "Courtice & Taunton",
-    recentActivity: "A contractor in north Oshawa booked a call last week",
   },
   ajax: {
     citySlug: "ajax",
@@ -307,7 +299,6 @@ const LOCATIONS_BASE: Record<string, Omit<LocationData, "faqs">> = {
     trustBlockCopy:
       "Ajax small businesses, contractors, and service teams need a modern website and dependable support without the agency overhead. Bayline builds clean sites, local SEO, and ongoing maintenance that keep you visible and easy to contact.",
     neighbors: "Pickering & Audley",
-    recentActivity: "A clinic near the Ajax waterfront booked a call last week",
   },
 };
 

@@ -1,97 +1,48 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Menu } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { Menu, X } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Logo } from "./logo";
-import { Button } from "./ui/button";
-import { cn } from "@/lib/utils";
+import { primaryNavigation } from "@/lib/data/business";
 
 export function Nav() {
-  const [scrolled, setScrolled] = useState(false);
-  const [open, setOpen] = useState(false);
   const pathname = usePathname();
-  const isHome = pathname === "/";
+  const [open, setOpen] = useState(false);
 
-  const links = [
-    ["Home", isHome ? "#top" : "/"],
-    ["What's included", isHome ? "#included" : "/#included"],
-    ["Why Bayline", isHome ? "#why" : "/#why"],
-    ["Services", "/services"],
-    ["Blog", "/blog"],
-  ] as const;
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 12);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  useEffect(() => setOpen(false), [pathname]);
 
   return (
-    <header
-      className={cn(
-        "sticky top-0 z-50 backdrop-blur-md backdrop-saturate-150 transition-[background-color,border-color] duration-200",
-        scrolled ? "bg-bg/80 border-b border-line" : "bg-transparent border-b border-transparent"
-      )}
-    >
-      <div className="mx-auto flex h-[72px] w-full max-w-[1280px] items-center justify-between px-8">
-        <Link href={isHome ? "#top" : "/"} aria-label="Bayline Digital home" className="text-ink">
-          <Logo />
-        </Link>
-
-        <nav className="hidden md:flex items-center gap-1">
-          {links.map(([label, href]) => (
-            <NavLink key={href} href={href} label={label} />
+    <header className="site-header">
+      <div className="wrap header-inner">
+        <Link href="/" aria-label="Bayline Digital home"><Logo /></Link>
+        <nav className="desktop-nav" aria-label="Main navigation">
+          {primaryNavigation.map((item) => (
+            <Link key={item.href} href={item.href} aria-current={pathname === item.href ? "page" : undefined}>
+              {item.label}
+            </Link>
           ))}
         </nav>
-
-        <div className="flex items-center gap-3">
-          <Button asChild size="sm" className="h-10 px-4 text-sm">
-            <Link href={isHome ? "#contact" : "/contact"}>
-              Book a call
-              <span aria-hidden className="text-base leading-none -translate-y-px">↗</span>
-            </Link>
-          </Button>
-          <button
-            aria-label="Menu"
-            onClick={() => setOpen(v => !v)}
-            className="md:hidden flex h-10 w-10 items-center justify-center rounded-[10px] border border-line cursor-pointer text-ink"
-          >
-            <Menu size={18} />
-          </button>
-        </div>
+        <Link className="header-cta" href="/contact">Start a conversation <span aria-hidden="true">↗</span></Link>
+        <button
+          className="menu-button"
+          type="button"
+          aria-label={open ? "Close menu" : "Open menu"}
+          aria-expanded={open}
+          aria-controls="mobile-navigation"
+          onClick={() => setOpen((value) => !value)}
+        >
+          {open ? <X size={20} /> : <Menu size={20} />}
+        </button>
       </div>
-
       {open && (
-        <div className="md:hidden border-t border-line bg-bg">
-          <div className="mx-auto flex w-full max-w-[1280px] flex-col gap-1 px-8 py-4">
-            {links.map(([label, href]) => (
-              <Link
-                key={href}
-                href={href}
-                onClick={() => setOpen(false)}
-                className="py-3 px-2 border-b border-line text-base text-ink"
-              >
-                {label}
-              </Link>
-            ))}
-          </div>
-        </div>
+        <nav className="mobile-nav wrap" id="mobile-navigation" aria-label="Mobile navigation">
+          {[{ label: "Home", href: "/" }, ...primaryNavigation, { label: "Contact", href: "/contact" }].map((item) => (
+            <Link key={item.href} href={item.href}>{item.label}<span aria-hidden="true">↗</span></Link>
+          ))}
+        </nav>
       )}
     </header>
-  );
-}
-
-function NavLink({ href, label }: { href: string; label: string }) {
-  return (
-    <Link
-      href={href}
-      className="group relative px-3.5 py-2.5 text-sm text-ink-2 rounded-full transition-colors hover:text-ink"
-    >
-      {label}
-      <span className="absolute left-3.5 right-3.5 bottom-1.5 h-px bg-ink origin-left scale-x-0 transition-transform duration-300 ease-[cubic-bezier(.2,.7,.2,1)] group-hover:scale-x-100" />
-    </Link>
   );
 }

@@ -1,31 +1,25 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Reveal } from "./reveal";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
-import { Textarea } from "./ui/textarea";
-import { Label } from "./ui/label";
-import { cn } from "@/lib/utils";
 import { businessConfig } from "@/lib/data/business";
-import { trackClientEvent } from "@/lib/analytics";
 import { SERVICE_OPTIONS } from "@/lib/data/locations";
-import { SELECT_SERVICE_EVENT } from "./service-cta";
+import { trackClientEvent } from "@/lib/analytics";
 
-const BUDGETS = ["<1k", "1-5k", "5-10k", "10-25k", "25-50k", "50k+"] as const;
+const BUDGETS = ["", "Under $5k", "$5k–$10k", "$10k–$25k", "$25k+"] as const;
 
-type FormState = {
+type FormData = {
   name: string;
   email: string;
   company: string;
+  website: string;
   city: string;
   service: string;
+  budget: string;
   details: string;
-  budget: (typeof BUDGETS)[number];
   customDropdownAnswer: string;
   industrySlug: string;
-  // Ads attribution (hidden)
+  sourcePage: string;
   utmSource: string;
   utmMedium: string;
   utmCampaign: string;
@@ -35,454 +29,195 @@ type FormState = {
   landingPageUrl: string;
   referrer: string;
   firstVisit: string;
+  websiteFax: string;
 };
 
-interface ContactProps {
+export type InquiryFormProps = {
+  variant?: "full" | "compact";
+  sourcePage: string;
+  city?: string;
+  service?: string;
   industrySlug?: string;
+  heading?: string;
   customDropdownLabel?: string;
   customDropdownOptions?: string[];
-  /** City context for local landing pages — shows City + Service fields and tags the lead. */
-  city?: string;
-  /** Pre-selected service (e.g. from the ad group / anchor). */
-  service?: string;
-  /** Page type for analytics + Slack routing. */
-  pageType?: string;
-}
+};
 
-// Maps a service anchor id (from a URL hash) to a SERVICE_OPTIONS label.
-function serviceFromAnchor(hash: string): string {
-  const id = hash.replace(/^#/, "");
-  const match: Record<string, string> = {
-    "custom-websites": "Custom Websites",
-    "website-redesigns": "Website Redesign",
-    "local-seo": "Local SEO",
-    "automation-systems": "Automation Systems",
-    "custom-apps": "Custom Apps",
-    "hosting-support": "Hosting & Support",
-  };
-  return match[id] || "";
-}
-
-export function Contact({
-  industrySlug = "",
-  customDropdownLabel,
-  customDropdownOptions,
+export function InquiryForm({
+  variant = "full",
+  sourcePage,
   city = "",
   service = "",
-  pageType = "site",
-}: ContactProps) {
+  industrySlug = "",
+  heading,
+  customDropdownLabel,
+  customDropdownOptions,
+}: InquiryFormProps) {
   const router = useRouter();
-  const isLocal = pageType === "location" || !!city;
-
-  const [data, setData] = useState<FormState>({
-    name: "",
-    email: "",
-    company: "",
-    city: city,
-    service: service || (isLocal ? SERVICE_OPTIONS[0] : ""),
-    details: "",
-    budget: "<1k",
-    customDropdownAnswer: "",
-    industrySlug: industrySlug,
-    utmSource: "",
-    utmMedium: "",
-    utmCampaign: "",
-    utmContent: "",
-    utmTerm: "",
-    gclid: "",
-    landingPageUrl: "",
-    referrer: "",
-    firstVisit: "",
+  const viewed = useRef(false);
+  const started = useRef(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [status, setStatus] = useState<{ type: "error" | "idle"; message: string }>({ type: "idle", message: "" });
+  const [data, setData] = useState<FormData>({
+    name: "", email: "", company: "", website: "", city, service,
+    budget: "", details: "", customDropdownAnswer: customDropdownOptions?.[0] ?? "",
+    industrySlug, sourcePage, utmSource: "", utmMedium: "", utmCampaign: "",
+    utmContent: "", utmTerm: "", gclid: "", landingPageUrl: "", referrer: "",
+    firstVisit: "", websiteFax: "",
   });
 
-  const [touched, setTouched] = useState<Record<string, boolean>>({});
-  const [started, setStarted] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-
-  // Capture full Google Ads attribution + page context on the client side
   useEffect(() => {
-    if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
-
-    // Persist the very first landing URL/timestamp across the visit.
     let firstVisit = "";
     let landingPageUrl = window.location.href;
     try {
-      firstVisit = window.localStorage.getItem("bayline_first_visit") || "";
-      if (!firstVisit) {
-        firstVisit = new Date().toISOString();
-        window.localStorage.setItem("bayline_first_visit", firstVisit);
-      }
-      const storedLanding = window.localStorage.getItem("bayline_landing_url");
-      if (!storedLanding) {
-        window.localStorage.setItem("bayline_landing_url", landingPageUrl);
-      } else {
-        landingPageUrl = storedLanding;
-      }
-    } catch {
-      // localStorage unavailable (private mode) — fall back to live values.
-    }
+      firstVisit = localStorage.getItem("bayline_first_visit") || new Date().toISOString();
+      localStorage.setItem("bayline_first_visit", firstVisit);
+      landingPageUrl = localStorage.getItem("bayline_landing_url") || landingPageUrl;
+      localStorage.setItem("bayline_landing_url", landingPageUrl);
+    } catch {}
 
-    const utmContent = params.get("utm_content") || "";
-    const attributedService =
-      service ||
-      serviceFromAnchor(window.location.hash) ||
-      (utmContent ? serviceFromAnchor(`#${utmContent.replace(/_/g, "-")}`) : "");
-
-    setData((d) => ({
-      ...d,
+    setData((current) => ({
+      ...current,
+      city: city || params.get("city") || current.city,
+      service: service || current.service,
+      sourcePage: sourcePage || window.location.pathname,
       utmSource: params.get("utm_source") || "",
       utmMedium: params.get("utm_medium") || "",
       utmCampaign: params.get("utm_campaign") || "",
-      utmContent,
+      utmContent: params.get("utm_content") || "",
       utmTerm: params.get("utm_term") || "",
       gclid: params.get("gclid") || "",
-      referrer: document.referrer || "",
       landingPageUrl,
+      referrer: document.referrer,
       firstVisit,
-      city: city || d.city || params.get("city") || "",
-      service: attributedService || d.service || (isLocal ? SERVICE_OPTIONS[0] : ""),
-      industrySlug: industrySlug || d.industrySlug || params.get("industry") || "",
     }));
-  }, [industrySlug, city, service, isLocal]);
 
-  // Let a service-section CTA pre-select the service in the form.
+    if (!viewed.current) {
+      viewed.current = true;
+      trackClientEvent("form_view", { source_page: sourcePage, city: city || undefined, service: service || undefined });
+    }
+  }, [city, service, sourcePage]);
+
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const handler = (e: Event) => {
-      const next = (e as CustomEvent<string>).detail;
-      if (next && SERVICE_OPTIONS.includes(next)) {
-        setData((d) => ({ ...d, service: next }));
-      }
+    const selectService = (event: Event) => {
+      const selectedService = (event as CustomEvent<string>).detail;
+      if (SERVICE_OPTIONS.includes(selectedService)) setData((current) => ({ ...current, service: selectedService }));
     };
-    window.addEventListener(SELECT_SERVICE_EVENT, handler);
-    return () => window.removeEventListener(SELECT_SERVICE_EVENT, handler);
+    window.addEventListener("bayline:select-service", selectService);
+    return () => window.removeEventListener("bayline:select-service", selectService);
   }, []);
 
-  // Set default selection for dynamic dropdown
-  useEffect(() => {
-    if (customDropdownOptions && customDropdownOptions.length > 0) {
-      setData((d) => ({
-        ...d,
-        customDropdownAnswer: d.customDropdownAnswer || customDropdownOptions[0],
-      }));
-    }
-  }, [customDropdownOptions]);
-
-  const errs = useMemo(() => {
-    const e: Partial<Record<keyof FormState, string>> = {};
-    if (!data.name.trim()) e.name = "Please enter your name";
-    if (!data.email.trim()) e.email = "Please enter your email";
-    else if (!/^\S+@\S+\.\S+$/.test(data.email)) e.email = "That email looks off";
-    return e;
+  const errors = useMemo(() => {
+    const next: Record<string, string> = {};
+    if (!data.name.trim()) next.name = "Enter your name.";
+    if (!data.email.trim()) next.email = "Enter your email.";
+    else if (!/^\S+@\S+\.\S+$/.test(data.email)) next.email = "Enter a valid email address.";
+    if (data.website && !/^https?:\/\//i.test(data.website)) next.website = "Include http:// or https://.";
+    return next;
   }, [data]);
 
-  const setField = <K extends keyof FormState>(k: K) =>
-    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
-      setData((d) => ({ ...d, [k]: e.target.value }));
-
-  const blur = (k: string) => () => setTouched((t) => ({ ...t, [k]: true }));
-
-  // Fire form_start once, on the first interaction with any field.
-  const onStart = () => {
-    if (started) return;
-    setStarted(true);
-    trackClientEvent("form_start", eventParams());
-  };
-
-  // Shared attribution parameters attached to every analytics event.
-  const eventParams = (extra: Record<string, unknown> = {}) => ({
+  const eventContext = () => ({
+    source_page: data.sourcePage,
     city: data.city || undefined,
     service: data.service || undefined,
-    page_type: pageType,
+    page_type: industrySlug ? "industry" : city ? "location" : sourcePage.includes("services/") ? "service" : "site",
     traffic_source: data.utmSource || undefined,
     campaign: data.utmCampaign || undefined,
-    keyword: data.utmTerm || undefined,
     gclid: data.gclid || undefined,
-    ...extra,
   });
 
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setTouched({ name: true, email: true });
-    if (Object.keys(errs).length) return;
-    setSubmitting(true);
-
-    try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, pageType }),
-      });
-
-      if (!res.ok) {
-        throw new Error("Failed to send inquiry");
-      }
-
-      // Funnel event only; /thank-you fires the primary generate_lead conversion.
-      trackClientEvent("form_submit_success", eventParams({ budget: data.budget }));
-      trackClientEvent("form_submit", { company: data.company, budget: data.budget });
-
-      // Redirect to the dedicated thank-you page for reliable Ads conversion tracking.
-      const qs = new URLSearchParams();
-      if (data.city) qs.set("city", data.city);
-      if (data.service) qs.set("service", data.service);
-      router.push(`/thank-you${qs.toString() ? `?${qs.toString()}` : ""}`);
-    } catch (err) {
-      console.error("Submit error:", err);
-      alert("Failed to send inquiry. Please try again or email contact@baylinedigital.com directly.");
-      setSubmitting(false);
-    }
+  const update = (field: keyof FormData) => (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setData((current) => ({ ...current, [field]: event.target.value }));
   };
 
+  async function submit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setTouched({ name: true, email: true, website: true });
+    setStatus({ type: "idle", message: "" });
+    if (Object.keys(errors).length) {
+      trackClientEvent("form_validation_error", { ...eventContext(), fields: Object.keys(errors).join(",") });
+      return;
+    }
+
+    setSubmitting(true);
+    trackClientEvent("form_submit", eventContext());
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) throw new Error("Delivery was not confirmed");
+
+      trackClientEvent("form_submit_success", eventContext());
+      trackClientEvent("form_success", eventContext());
+      try { sessionStorage.setItem("bayline_confirmed_lead", "1"); } catch {}
+      const params = new URLSearchParams();
+      if (data.city) params.set("city", data.city);
+      if (data.service) params.set("service", data.service);
+      router.push(`/thank-you${params.size ? `?${params}` : ""}`);
+    } catch {
+      setStatus({ type: "error", message: `We could not confirm delivery. Try again or email ${businessConfig.email}.` });
+      trackClientEvent("form_error", eventContext());
+      setSubmitting(false);
+    }
+  }
+
+  function onStart() {
+    if (started.current) return;
+    started.current = true;
+    trackClientEvent("form_start", eventContext());
+  }
+
+  const compact = variant === "compact";
   return (
-    <section id="contact" className="relative overflow-hidden py-32 border-t border-line">
-      <div className="absolute inset-x-4 inset-y-[60px] z-0 rounded-[22px] bg-ink md:inset-x-8 md:rounded-[28px]" />
-      <div className="relative z-10 mx-auto w-full max-w-[1280px] px-8">
-        <div className="grid grid-cols-1 gap-14 px-7 py-12 text-bg md:grid-cols-2 md:gap-14 md:px-14 md:py-[72px]">
-          <div>
-            <Reveal>
-              <div className="inline-flex items-center gap-2.5 font-mono text-[11px] uppercase tracking-[0.14em] text-bg/55">
-                <span className="h-px w-6 bg-bg/35" />
-                06 — Contact
-              </div>
-            </Reveal>
-            <Reveal as="h2" className="m-0 mt-5 mb-6 text-[clamp(34px,4.4vw,56px)] tracking-[-0.03em] leading-none font-medium text-bg">
-              Let&apos;s map out <br />your <span className="font-serif italic text-accent">next build</span>.
-            </Reveal>
-            <Reveal as="p" className="m-0 max-w-[460px] text-[17px] leading-[1.6] text-bg/70">
-              Have a website, campaign funnel, app idea, or internal workflow that needs an upgrade?
-              Tell Bayline what you&apos;re working on and we&apos;ll respond within one business day.
-            </Reveal>
+    <form className={`inquiry-form ${compact ? "inquiry-form-compact" : ""}`} id="inquiry" onSubmit={submit} onFocus={onStart} noValidate>
+      <div className="form-heading">
+        <span>{compact ? "FREE HOMEPAGE REVIEW" : "NEW PROJECT INQUIRY"}</span>
+        <h2>{heading ?? (compact ? "Tell us where to look." : "Tell us what you are working on.")}</h2>
+      </div>
+      <FormField label="Name" id={`${sourcePage}-name`} error={touched.name ? errors.name : undefined}>
+        <input id={`${sourcePage}-name`} value={data.name} onChange={update("name")} onBlur={() => setTouched((v) => ({ ...v, name: true }))} autoComplete="name" />
+      </FormField>
+      <FormField label="Work email" id={`${sourcePage}-email`} error={touched.email ? errors.email : undefined}>
+        <input id={`${sourcePage}-email`} type="email" value={data.email} onChange={update("email")} onBlur={() => setTouched((v) => ({ ...v, email: true }))} autoComplete="email" />
+      </FormField>
+      {!compact && <FormField label="Company (optional)" id={`${sourcePage}-company`}><input id={`${sourcePage}-company`} value={data.company} onChange={update("company")} autoComplete="organization" /></FormField>}
+      <FormField label="Current website (optional)" id={`${sourcePage}-website`} error={touched.website ? errors.website : undefined}>
+        <input id={`${sourcePage}-website`} type="url" value={data.website} onChange={update("website")} onBlur={() => setTouched((v) => ({ ...v, website: true }))} placeholder="https://" inputMode="url" />
+      </FormField>
+      <FormField label="Service interest" id={`${sourcePage}-service`}>
+        <select id={`${sourcePage}-service`} value={data.service} onChange={update("service")}>
+          <option value="">Not sure yet</option>
+          {data.service && !SERVICE_OPTIONS.includes(data.service) && <option value={data.service}>{data.service}</option>}
+          {SERVICE_OPTIONS.map((option) => <option key={option} value={option}>{option}</option>)}
+        </select>
+      </FormField>
+      {!compact && <FormField label="Budget range (optional)" id={`${sourcePage}-budget`}><select id={`${sourcePage}-budget`} value={data.budget} onChange={update("budget")}>{BUDGETS.map((option) => <option key={option} value={option}>{option || "Select a range"}</option>)}</select></FormField>}
+      {customDropdownLabel && customDropdownOptions && <FormField label={customDropdownLabel} id={`${sourcePage}-custom`}><select id={`${sourcePage}-custom`} value={data.customDropdownAnswer} onChange={update("customDropdownAnswer")}>{customDropdownOptions.map((option) => <option key={option}>{option}</option>)}</select></FormField>}
+      <FormField className="form-wide" label="Project note (optional)" id={`${sourcePage}-details`}><textarea id={`${sourcePage}-details`} rows={compact ? 3 : 5} value={data.details} onChange={update("details")} placeholder="A sentence or two is plenty." /></FormField>
+      <div className="honeypot" aria-hidden="true"><label htmlFor={`${sourcePage}-fax`}>Fax</label><input id={`${sourcePage}-fax`} tabIndex={-1} autoComplete="off" value={data.websiteFax} onChange={update("websiteFax")} /></div>
+      <button className="form-submit form-wide" type="submit" disabled={submitting}>{submitting ? "Sending..." : compact ? "Request my free review" : "Send inquiry"}<span aria-hidden="true">↗</span></button>
+      <div className="form-status form-wide" role="status" aria-live="polite">{status.type === "error" ? status.message : ""}</div>
+    </form>
+  );
+}
 
-            <Reveal className="mt-10 flex flex-col gap-[18px]">
-              <ContactRow label="Email" value={businessConfig.email} />
-              <ContactRow label="Phone" value={businessConfig.phone} />
-              <ContactRow label="Hours" value={businessConfig.hours} />
-              <ContactRow label="Office" value={businessConfig.office} />
-            </Reveal>
+function FormField({ label, id, error, className = "", children }: { label: string; id: string; error?: string; className?: string; children: React.ReactNode }) {
+  return <div className={`form-field ${className}`}><label htmlFor={id}>{label}</label>{children}{error && <p className="field-error">{error}</p>}</div>;
+}
 
-            <Reveal className="mt-8">
-              <p className="text-[14.5px] text-bg/60 m-0 leading-relaxed">
-                Prefer to schedule immediately?{" "}
-                <a
-                  href={businessConfig.calendlyUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => trackClientEvent("click_calendly", { location: "contact_sidebar" })}
-                  className="text-accent underline font-medium hover:text-white transition-colors"
-                >
-                  Book a 30-min video call ↗
-                </a>
-              </p>
-            </Reveal>
-          </div>
+type ContactProps = Omit<InquiryFormProps, "sourcePage" | "variant"> & { pageType?: string };
 
-          <Reveal className="relative rounded-[20px] bg-bg-card p-8 text-ink">
-              <form onSubmit={submit} noValidate onFocus={onStart}>
-                <div className="mb-[18px] font-mono text-[11px] text-muted-2">
-                  NEW PROJECT INQUIRY
-                  {data.city
-                    ? ` · ${data.city.toUpperCase()}`
-                    : data.industrySlug && ` · FOR ${data.industrySlug.toUpperCase().replace("-", " ")}`}
-                </div>
-
-                {/* Hidden attribution tracking fields */}
-                <input type="hidden" name="industry_slug" value={data.industrySlug} />
-                <input type="hidden" name="utm_source" value={data.utmSource} />
-                <input type="hidden" name="utm_medium" value={data.utmMedium} />
-                <input type="hidden" name="utm_campaign" value={data.utmCampaign} />
-                <input type="hidden" name="utm_content" value={data.utmContent} />
-                <input type="hidden" name="utm_term" value={data.utmTerm} />
-                <input type="hidden" name="gclid" value={data.gclid} />
-                <input type="hidden" name="landing_page_url" value={data.landingPageUrl} />
-                <input type="hidden" name="referrer" value={data.referrer} />
-                <input type="hidden" name="first_visit" value={data.firstVisit} />
-
-                <Field
-                  label="Name"
-                  id="name"
-                  value={data.name}
-                  onChange={setField("name")}
-                  onBlur={blur("name")}
-                  err={touched.name ? errs.name : undefined}
-                  placeholder="Your name"
-                />
-                
-                <Field
-                  label="Email"
-                  id="email"
-                  type="email"
-                  value={data.email}
-                  onChange={setField("email")}
-                  onBlur={blur("email")}
-                  err={touched.email ? errs.email : undefined}
-                  placeholder="you@company.com"
-                />
-                
-                <Field
-                  label="Company"
-                  id="company"
-                  value={data.company}
-                  onChange={setField("company")}
-                  onBlur={blur("company")}
-                  placeholder="Optional"
-                />
-
-                {isLocal && (
-                  <>
-                    <Field
-                      label="City"
-                      id="city"
-                      value={data.city}
-                      onChange={setField("city")}
-                      placeholder="Your city"
-                    />
-
-                    <div className="mt-4">
-                      <Label htmlFor="service">Service interested in</Label>
-                      <div className="mt-2 relative">
-                        <select
-                          id="service"
-                          value={data.service}
-                          onChange={setField("service")}
-                          className="flex h-12 w-full rounded-xl border border-line-2 bg-bg px-3.5 py-2.5 text-[14.5px] text-ink focus:border-ink focus:outline-none focus:ring-4 focus:ring-ink/5 transition-[border-color,box-shadow]"
-                        >
-                          {SERVICE_OPTIONS.map((opt) => (
-                            <option key={opt} value={opt}>
-                              {opt}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                <div className="mt-4">
-                  <Label>Budget range</Label>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {BUDGETS.map((b) => (
-                      <button
-                        key={b}
-                        type="button"
-                        onClick={() => setData((d) => ({ ...d, budget: b }))}
-                        className={cn(
-                          "rounded-full border px-3.5 py-2 text-[13px] transition-all cursor-pointer",
-                          data.budget === b
-                            ? "border-ink bg-ink text-bg"
-                            : "border-line-2 bg-transparent text-ink-2 hover:border-ink-2"
-                        )}
-                      >
-                        {b}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Custom Industry Dynamic Questionnaire Dropdown */}
-                {customDropdownLabel && customDropdownOptions && (
-                  <div className="mt-4">
-                    <Label htmlFor="custom-dropdown">{customDropdownLabel}</Label>
-                    <div className="mt-2 relative">
-                      <select
-                        id="custom-dropdown"
-                        value={data.customDropdownAnswer}
-                        onChange={setField("customDropdownAnswer")}
-                        className="flex h-12 w-full rounded-xl border border-line-2 bg-bg px-3.5 py-2.5 text-[14.5px] text-ink focus:border-ink focus:outline-none focus:ring-4 focus:ring-ink/5 transition-[border-color,box-shadow]"
-                      >
-                        {customDropdownOptions.map((opt) => (
-                          <option key={opt} value={opt}>
-                            {opt}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                )}
-
-                <Field
-                  label="Project details (optional)"
-                  id="details"
-                  textarea
-                  value={data.details}
-                  onChange={setField("details")}
-                  onBlur={blur("details")}
-                  placeholder="Optional — a few words about your project, timeline, or what success looks like."
-                />
-
-                <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
-                  <div className="font-mono text-[11px] text-muted-2">
-                    {Object.keys(errs).length === 0
-                      ? "Ready to send"
-                      : `${Object.keys(errs).length} field${Object.keys(errs).length > 1 ? "s" : ""} need attention`}
-                  </div>
-                  <Button type="submit" disabled={submitting}>
-                    {submitting ? "Sending…" : "Send inquiry"}
-                    <span aria-hidden className="inline-flex h-[22px] w-[22px] items-center justify-center rounded-full bg-white/10 ml-2">→</span>
-                  </Button>
-                </div>
-              </form>
-          </Reveal>
-        </div>
+export function Contact(props: ContactProps) {
+  return (
+    <section className="inquiry-band" id="contact">
+      <div className="wrap inquiry-layout">
+        <div><p className="eyebrow">START A CONVERSATION</p><h2>A useful first step, without the hard pitch.</h2><p>Share the current website or the problem you are trying to solve. Bayline will reply with practical next steps.</p></div>
+        <InquiryForm {...props} sourcePage={typeof props.pageType === "string" ? props.pageType : "inquiry"} />
       </div>
     </section>
-  );
-}
-
-function ContactRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex justify-between gap-4 border-b border-bg/10 pb-3.5">
-      <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-bg/55">{label}</span>
-      <span className="text-[15px] text-bg font-medium">{value}</span>
-    </div>
-  );
-}
-
-interface FieldProps {
-  label: string;
-  id: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  onBlur?: () => void;
-  err?: string;
-  placeholder?: string;
-  type?: string;
-  textarea?: boolean;
-}
-
-function Field({ label, id, value, onChange, onBlur, err, placeholder, type, textarea }: FieldProps) {
-  return (
-    <div className="mt-4">
-      <div className="flex justify-between">
-        <Label htmlFor={id}>{label}</Label>
-        {err && (
-          <span className="text-[11px] text-warn font-sans normal-case tracking-normal">{err}</span>
-        )}
-      </div>
-      <div className="mt-2">
-        {textarea ? (
-          <Textarea
-            id={id}
-            value={value}
-            onChange={onChange}
-            onBlur={onBlur}
-            placeholder={placeholder}
-            aria-invalid={!!err}
-            rows={4}
-          />
-        ) : (
-          <Input
-            id={id}
-            type={type}
-            value={value}
-            onChange={onChange}
-            onBlur={onBlur}
-            placeholder={placeholder}
-            aria-invalid={!!err}
-          />
-        )}
-      </div>
-    </div>
   );
 }
