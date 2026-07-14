@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { draft, draftVersion, publicationAttempt, socialConnection } from "@/lib/db/schema";
 import { decryptToken, sanitizeError } from "./crypto";
 import { GRAPH_BASE_URL } from "./constants";
+import { hasMeaningfulSocialCopy } from "./generation";
 
 type MetaError = { error?: { message?: string; code?: number; error_subcode?: number; is_transient?: boolean } };
 
@@ -65,6 +66,9 @@ export async function publishDraft(draftId: string) {
     .where(eq(draft.id, draftId)).limit(1);
   if (!record) throw new Error("Draft or approved version not found");
   if (record.draft.approval !== "APPROVED") throw new Error("Draft is not approved");
+  if (![record.version.facebookCaption, record.version.instagramCaption].every(hasMeaningfulSocialCopy)) {
+    throw new Error("This draft contains malformed caption text. Regenerate it before publishing.");
+  }
 
   const connection = await db.query.socialConnection.findFirst({ where: eq(socialConnection.ownerUserId, record.draft.approvedBy!) });
   if (!connection || connection.status !== "CONNECTED") throw new Error("Meta connection is not healthy");

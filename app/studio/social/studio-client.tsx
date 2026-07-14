@@ -5,7 +5,7 @@ import { FormEvent, useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowRight, CalendarDays, Check, CircleAlert, Clock3, ExternalLink,
-  Facebook, Image as ImageIcon, Instagram, Loader2, LogOut, Menu,
+  Copy, Facebook, Image as ImageIcon, Instagram, Loader2, LogOut, Menu,
   Pause, Play, Plus, RotateCcw, Send, ShieldCheck, Sparkles, Trash2, X,
 } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
@@ -55,7 +55,7 @@ export function StudioClient({ data }: { data: StudioData }) {
   const active = data.drafts.filter((item) => liveStatuses.includes(item.draft.status));
   const history = data.drafts.filter((item) => !liveStatuses.includes(item.draft.status));
   const [selectedId, setSelectedId] = useState(active[0]?.draft.id || history[0]?.draft.id || "");
-  const selected = data.drafts.find((item) => item.draft.id === selectedId) || active[0] || history[0];
+  const selectedActive = active.find((item) => item.draft.id === selectedId) || active[0];
   const [mobileNav, setMobileNav] = useState(false);
   const [confirm, setConfirm] = useState<ConfirmState>(null);
   const [toast, setToast] = useState<string | null>(null);
@@ -132,9 +132,9 @@ export function StudioClient({ data }: { data: StudioData }) {
         <aside className={`studio-sidebar ${mobileNav ? "is-open" : ""}`}>
           <nav>
             <p>Workspace</p>
-            <button className={tab === "queue" ? "active" : ""} onClick={() => { setTab("queue"); setMobileNav(false); }}><ImageIcon size={16} /> Draft queue <span>{active.length}</span></button>
+            <button className={tab === "queue" ? "active" : ""} onClick={() => { setSelectedId(active[0]?.draft.id || ""); setTab("queue"); setMobileNav(false); }}><ImageIcon size={16} /> Draft queue <span>{active.length}</span></button>
             <button className={tab === "schedule" ? "active" : ""} onClick={() => { setTab("schedule"); setMobileNav(false); }}><CalendarDays size={16} /> Schedule</button>
-            <button className={tab === "history" ? "active" : ""} onClick={() => { setTab("history"); setMobileNav(false); }}><Clock3 size={16} /> Publish history</button>
+            <button className={tab === "history" ? "active" : ""} onClick={() => { setSelectedId(history[0]?.draft.id || ""); setTab("history"); setMobileNav(false); }}><Clock3 size={16} /> Finished posts</button>
           </nav>
           <div className="studio-side-account">
             <p>Meta connection</p>
@@ -146,15 +146,15 @@ export function StudioClient({ data }: { data: StudioData }) {
 
         <section className="studio-workspace">
           <div className="studio-pagehead">
-            <div><p className="studio-kicker">{tab === "queue" ? "CONTENT OPERATIONS" : tab === "schedule" ? "AUTOMATIONS" : "PUBLICATION LEDGER"}</p><h1>{tab === "queue" ? "Draft queue" : tab === "schedule" ? "Schedule" : "Publish history"}</h1><p>{tab === "queue" ? `${active.filter((item) => item.draft.status === "AWAITING_APPROVAL").length} awaiting your review · ${active.length} active drafts` : tab === "schedule" ? `${data.automations.filter((item) => item.status === "ACTIVE").length} active schedules · Toronto time` : `${history.filter((item) => item.draft.status === "PUBLISHED").length} posts published`}</p></div>
+            <div><p className="studio-kicker">{tab === "queue" ? "CONTENT OPERATIONS" : tab === "schedule" ? "AUTOMATIONS" : "POST ARCHIVE"}</p><h1>{tab === "queue" ? "Draft queue" : tab === "schedule" ? "Schedule" : "Finished posts"}</h1><p>{tab === "queue" ? `${active.filter((item) => item.draft.status === "AWAITING_APPROVAL").length} awaiting your review · ${active.length} active drafts` : tab === "schedule" ? `${data.automations.filter((item) => item.status === "ACTIVE").length} active schedules · Toronto time` : `${history.filter((item) => item.draft.status === "PUBLISHED").length} published · ${history.length} finished posts`}</p></div>
             <button className="studio-primary" onClick={() => createDialog.current?.showModal()}><Plus size={16} /> New schedule</button>
           </div>
 
           <ConnectionBanner connection={data.connection} />
 
-          {tab === "queue" && <QueueView items={active} selectedId={selected?.draft.id || ""} onSelect={setSelectedId} selected={selected} attempts={data.attempts} action={action} ask={ask} preview={() => previewDialog.current?.showModal()} pending={pending} />}
+          {tab === "queue" && <QueueView items={active} selectedId={selectedActive?.draft.id || ""} onSelect={setSelectedId} selected={selectedActive} attempts={data.attempts} action={action} ask={ask} preview={() => previewDialog.current?.showModal()} pending={pending} />}
           {tab === "schedule" && <ScheduleView automations={data.automations} action={action} ask={ask} pending={pending} />}
-          {tab === "history" && <HistoryView items={history} attempts={data.attempts} onSelect={(id) => { setSelectedId(id); setTab("queue"); }} />}
+          {tab === "history" && <HistoryView items={history} attempts={data.attempts} selectedId={selectedId} onSelect={setSelectedId} />}
         </section>
       </div>
 
@@ -165,7 +165,7 @@ export function StudioClient({ data }: { data: StudioData }) {
       <ConfirmDialog state={confirm} pending={pending} close={() => setConfirm(null)} run={runConfirm} />
       <dialog ref={previewDialog} className="studio-preview-dialog" onClick={(event) => { if (event.target === previewDialog.current) previewDialog.current.close(); }}>
         <button onClick={() => previewDialog.current?.close()} aria-label="Close preview"><X size={20} /></button>
-        {selected?.version && <img src={selected.version.assetUrl} alt={selected.version.brief.headline} />}
+        {selectedActive?.version && <img src={selectedActive.version.assetUrl} alt={selectedActive.version.brief.headline} />}
       </dialog>
       {toast && <button className="studio-toast" onClick={() => setToast(null)}><Check size={15} />{toast}<X size={14} /></button>}
       {(pending || requesting) && <div className="studio-global-progress"><Loader2 size={16} className="spin" /> Syncing generation progress…</div>}
@@ -189,7 +189,7 @@ function QueueView({ items, selectedId, onSelect, selected, attempts, action, as
         <PlatformMarks destinations={item.draft.destinations} />
       </button>)}
     </div>
-    {selected && <DraftInspector key={selected.draft.id} item={selected} attempts={attempts.filter((attempt) => attempt.draftId === selected.draft.id)} action={action} ask={ask} preview={preview} pending={pending} />}
+    {selected && <DraftInspector key={`${selected.draft.id}:${selected.draft.currentVersionId || selected.draft.generationStage}`} item={selected} attempts={attempts.filter((attempt) => attempt.draftId === selected.draft.id)} action={action} ask={ask} preview={preview} pending={pending} />}
   </div>;
 }
 
@@ -233,9 +233,34 @@ function ScheduleView({ automations, action, ask, pending }: { automations: Auto
   return <div className="studio-schedule-table"><div className="studio-table-head"><span>Automation</span><span>Cadence</span><span>Destinations</span><span>Next occurrence</span><span>Status</span><span /></div>{automations.map((item) => <div className="studio-table-row" key={item.id}><div><strong>{item.name}</strong><small>{item.promptSpec.topic}</small></div><span>{item.kind === "ONE_TIME" ? "One time" : `${item.weekdays?.map((day) => week[day]).join(", ")} · ${item.publishTime}`}</span><PlatformMarks destinations={item.destinations} /><span>{item.nextOccurrenceAt ? studioDate(item.nextOccurrenceAt) : "—"}</span><StatusPill status={item.status} /><div className="studio-schedule-actions"><button aria-label={item.status === "ACTIVE" ? "Pause schedule" : "Resume schedule"} disabled={item.status === "COMPLETED" || pending} onClick={() => action({ action: "pause", automationId: item.id, paused: item.status === "ACTIVE" })}>{item.status === "ACTIVE" ? <Pause size={14} /> : <Play size={14} />}</button><button className="danger" aria-label="Delete schedule" disabled={pending} onClick={() => ask({ title: "Permanently delete this schedule?", body: `“${item.name}” will stop creating posts. Every unpublished draft belonging only to this schedule will also be removed. Published and partially published history will be preserved.`, confirm: "Delete schedule", danger: true, run: () => action({ action: "deleteSchedule", automationId: item.id }) })}><Trash2 size={14} /></button></div></div>)}</div>;
 }
 
-function HistoryView({ items, attempts, onSelect }: { items: StudioData["drafts"]; attempts: Attempt[]; onSelect: (id: string) => void }) {
+function HistoryView({ items, attempts, selectedId, onSelect }: { items: StudioData["drafts"]; attempts: Attempt[]; selectedId: string; onSelect: (id: string) => void }) {
   if (!items.length) return <div className="studio-empty"><Clock3 size={25} /><h2>No history yet.</h2><p>Published, missed, and cancelled posts will form an immutable ledger here.</p></div>;
-  return <div className="studio-history-grid">{items.map((item) => <button key={item.draft.id} onClick={() => onSelect(item.draft.id)}>{item.version?.assetUrl ? <img src={item.version.assetUrl} alt="" /> : <div className="studio-history-placeholder"><ImageIcon /></div>}<div><StatusPill status={item.draft.status} /><strong>{item.version?.brief.headline || "Draft without creative"}</strong><small>{studioDate(item.draft.scheduledFor)}</small><span>{attempts.filter((entry) => entry.draftId === item.draft.id && entry.status === "PUBLISHED").length} platform publications</span></div></button>)}</div>;
+  const selected = items.find((item) => item.draft.id === selectedId) || items[0];
+  const selectedAttempts = attempts.filter((attempt) => attempt.draftId === selected.draft.id);
+
+  async function copyCaption(label: string, caption: string) {
+    await navigator.clipboard.writeText(caption);
+    // A compact native announcement keeps this archive useful without adding another global state channel.
+    const region = document.getElementById("studio-copy-status");
+    if (region) region.textContent = `${label} caption copied`;
+  }
+
+  return <div className="studio-history-layout">
+    <div className="studio-history-grid" aria-label="Finished post archive">{items.map((item) => {
+      const publishedCount = attempts.filter((entry) => entry.draftId === item.draft.id && entry.status === "PUBLISHED").length;
+      return <button key={item.draft.id} className={item.draft.id === selected.draft.id ? "active" : ""} aria-pressed={item.draft.id === selected.draft.id} onClick={() => onSelect(item.draft.id)}>{item.version?.assetUrl ? <img src={item.version.assetUrl} alt="" /> : <div className="studio-history-placeholder"><ImageIcon /></div>}<div><StatusPill status={item.draft.status} /><strong>{item.version?.brief.headline || "Draft without creative"}</strong><small>{studioDate(item.draft.scheduledFor)}</small><span>{publishedCount ? `${publishedCount} platform publication${publishedCount === 1 ? "" : "s"}` : "Not published"}</span></div></button>;
+    })}</div>
+    <article className="studio-finished-post">
+      <div className="studio-finished-head"><div><p className="studio-kicker">FINISHED / VERSION {String(selected.version?.version || 0).padStart(2, "0")}</p><h2>{selected.version?.brief.headline || "Draft without creative"}</h2><div><StatusPill status={selected.draft.status} /><span>{studioDate(selected.draft.scheduledFor)}</span><PlatformMarks destinations={selected.draft.destinations} /></div></div></div>
+      {selected.version ? <>
+        <img className="studio-finished-creative" src={selected.version.assetUrl} alt={selected.version.brief.headline} />
+        <section className="studio-finished-copy"><header><span><Facebook size={14} /> Facebook caption</span><button onClick={() => copyCaption("Facebook", selected.version!.facebookCaption)}><Copy size={13} /> Copy</button></header><p>{selected.version.facebookCaption}</p></section>
+        <section className="studio-finished-copy"><header><span><Instagram size={14} /> Instagram caption</span><button onClick={() => copyCaption("Instagram", selected.version!.instagramCaption)}><Copy size={13} /> Copy</button></header><p>{selected.version.instagramCaption}</p></section>
+      </> : <div className="studio-finished-missing"><ImageIcon size={22} /><p>No creative was completed for this post.</p></div>}
+      {selectedAttempts.length > 0 && <div className="studio-finished-links"><p className="studio-kicker">PUBLICATION RECEIPTS</p>{selectedAttempts.map((attempt) => <div key={attempt.id}><span>{attempt.platform === "FACEBOOK" ? <Facebook size={14} /> : <Instagram size={14} />}{statusLabel(attempt.platform)}</span><StatusPill status={attempt.status} />{attempt.permalink ? <a href={attempt.permalink} target="_blank" rel="noreferrer">View live post <ExternalLink size={12} /></a> : <small>{attempt.lastError || "No public link available"}</small>}</div>)}</div>}
+      <span id="studio-copy-status" className="studio-sr-only" aria-live="polite" />
+    </article>
+  </div>;
 }
 
 function EmptyState({ schedule = false }: { schedule?: boolean }) {

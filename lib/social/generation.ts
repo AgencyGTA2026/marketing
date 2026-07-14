@@ -71,6 +71,25 @@ const BriefSchema = z.object({
   hashtags: z.array(z.string().regex(/^#[A-Za-z0-9]+$/)).max(5),
 });
 
+/** Rejects model output that is technically a string but is not usable prose. */
+export function hasMeaningfulSocialCopy(value: string) {
+  const normalized = value.normalize("NFKC").trim();
+  const letters = normalized.match(/\p{L}/gu) || [];
+  if (letters.length < 8 || new Set(letters.map((letter) => letter.toLocaleLowerCase("en"))).size < 4) return false;
+
+  const visible = normalized.replace(/\s/g, "").toLocaleLowerCase("en");
+  const counts = new Map<string, number>();
+  for (const character of visible) counts.set(character, (counts.get(character) || 0) + 1);
+  const dominant = Math.max(0, ...counts.values());
+  return visible.length > 0 && dominant / visible.length < 0.72;
+}
+
+function assertBriefQuality(brief: z.infer<typeof BriefSchema>) {
+  if (![brief.headline, brief.facebookCaption, brief.instagramCaption].every(hasMeaningfulSocialCopy)) {
+    throw new Error("The content model returned malformed social copy");
+  }
+}
+
 function xml(value: string) {
   return value.replace(/[<>&'"]/g, (character) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", "'": "&apos;", '"': "&quot;" })[character]!);
 }
@@ -127,16 +146,25 @@ export async function renderCreative(image: Buffer, brief: Pick<CreativeBrief, "
 }
 
 async function createBrief(spec: typeof automation.$inferSelect.promptSpec, extra?: string) {
-  const response = await openaiClient().responses.parse({
-    model: process.env.OPENAI_TEXT_MODEL || "gpt-5-mini",
-    input: [
-      { role: "system", content: `You are Bayline Digital's senior social editor. Write useful, specific English copy. Do not invent facts, results, customers, statistics, awards, or capabilities. Keep hashtags restrained and relevant. The headline must be short enough for an editorial image. The on-image kicker is a short editorial category label. The on-image support is one concise sentence that adds a useful second layer without repeating the headline.\n\nAGENCY CONTEXT:\n${AGENCY_CONTEXT}\n\nVISUAL SYSTEM:\n${BRAND_BRIEF}` },
-      { role: "user", content: `Topic: ${spec.topic}\nAudience: ${spec.audience}\nKey message: ${spec.keyMessage}\nCTA: ${spec.cta}\nURL: ${spec.url || "None"}\nNotes: ${spec.notes || "None"}${extra ? `\nGeneration context:\n${extra}` : ""}` },
-    ],
-    text: { format: zodTextFormat(BriefSchema, "social_creative") },
-  });
-  if (!response.output_parsed) throw new Error("The content model did not return a creative brief");
-  return response.output_parsed;
+  let lastError: unknown;
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      const response = await openaiClient().responses.parse({
+        model: process.env.OPENAI_TEXT_MODEL || "gpt-5-mini",
+        input: [
+          { role: "system", content: `You are Bayline Digital's senior social editor. Write useful, specific English copy. Do not invent facts, results, customers, statistics, awards, or capabilities. Keep hashtags restrained and relevant. The headline must be short enough for an editorial image. The on-image kicker is a short editorial category label. The on-image support is one concise sentence that adds a useful second layer without repeating the headline. Every copy field must contain natural English prose—never placeholders, repeated characters, or numeric filler.\n\nAGENCY CONTEXT:\n${AGENCY_CONTEXT}\n\nVISUAL SYSTEM:\n${BRAND_BRIEF}` },
+          { role: "user", content: `Topic: ${spec.topic}\nAudience: ${spec.audience}\nKey message: ${spec.keyMessage}\nCTA: ${spec.cta}\nURL: ${spec.url || "None"}\nNotes: ${spec.notes || "None"}${extra ? `\nGeneration context:\n${extra}` : ""}${attempt ? "\nThe previous response was malformed. Return complete natural-language copy in every field." : ""}` },
+        ],
+        text: { format: zodTextFormat(BriefSchema, "social_creative") },
+      });
+      if (!response.output_parsed) throw new Error("The content model did not return a creative brief");
+      assertBriefQuality(response.output_parsed);
+      return response.output_parsed;
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  throw lastError instanceof Error ? lastError : new Error("The content model did not return usable social copy");
 }
 
 async function createImage(brief: CreativeBrief) {

@@ -1,9 +1,15 @@
 import { createHash } from "node:crypto";
 import sharp from "sharp";
 import { describe, expect, it } from "vitest";
-import { renderCreative, wrapHeadline } from "@/lib/social/generation";
+import { hasMeaningfulSocialCopy, renderCreative, wrapHeadline } from "@/lib/social/generation";
 
 describe("Bayline Digital 4:5 renderer", () => {
+  it("rejects repeated-character model output before it can be published", () => {
+    expect(hasMeaningfulSocialCopy("000000000000000000000000000000")).toBe(false);
+    expect(hasMeaningfulSocialCopy("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")).toBe(false);
+    expect(hasMeaningfulSocialCopy("A practical website should make the next step obvious.")).toBe(true);
+  });
+
   it("wraps long headlines into the safe editorial area", () => {
     const lines = wrapHeadline("A practical system for turning better websites into steady growth");
     expect(lines.length).toBeLessThanOrEqual(4);
