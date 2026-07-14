@@ -5,6 +5,7 @@ import OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
 import { put } from "@vercel/blob";
 import { Resvg } from "@resvg/resvg-js";
+import * as opentype from "opentype.js";
 import sharp from "sharp";
 import { z } from "zod";
 import { and, desc, eq, isNull, lt, or } from "drizzle-orm";
@@ -92,10 +93,6 @@ function assertBriefQuality(brief: z.infer<typeof BriefSchema>) {
   }
 }
 
-function xml(value: string) {
-  return value.replace(/[<>&'"]/g, (character) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", "'": "&apos;", '"': "&quot;" })[character]!);
-}
-
 function normalizeDisplayText(value: string) {
   return value.normalize("NFKC").replace(/[\u0000-\u001F\u007F]/g, " ").replace(/\s+/g, " ").trim();
 }
@@ -155,21 +152,57 @@ export function layoutHeadline(headline: string, maxWidth = 520) {
   return { lines: wrapToPixelWidth(headline, 26, maxWidth), fontSize: 26 };
 }
 
-function layoutSupport(value: string, maxWidth = 500) {
-  for (const fontSize of [29, 27, 25, 23, 21, 19, 17]) {
-    const lines = wrapToPixelWidth(value, fontSize, maxWidth);
-    if (lines.length <= 3 && lines.every((line) => estimatedLineWidth(line, fontSize) <= maxWidth)) return { lines, fontSize };
+function wrapWithFont(font: opentype.Font, value: string, fontSize: number, maxWidth: number) {
+  const lines: string[] = [];
+  const words = normalizeDisplayText(value).split(/\s+/).filter(Boolean).flatMap((word) => {
+    if (font.getAdvanceWidth(word, fontSize) <= maxWidth) return [word];
+    const pieces: string[] = [];
+    let piece = "";
+    for (const character of word) {
+      if (piece && font.getAdvanceWidth(`${piece}${character}`, fontSize) > maxWidth) {
+        pieces.push(piece);
+        piece = character;
+      } else piece += character;
+    }
+    if (piece) pieces.push(piece);
+    return pieces;
+  });
+
+  for (const word of words) {
+    const current = lines.at(-1);
+    const candidate = current ? `${current} ${word}` : word;
+    if (!current) lines.push(word);
+    else if (font.getAdvanceWidth(candidate, fontSize) <= maxWidth) lines[lines.length - 1] = candidate;
+    else lines.push(word);
   }
-  return { lines: wrapToPixelWidth(value, 16, maxWidth), fontSize: 16 };
+  return lines;
 }
 
-let rendererFontsPromise: Promise<{ sans: Buffer; mono: Buffer }> | null = null;
+function layoutWithFont(font: opentype.Font, value: string, maxWidth: number, maxLines: number, sizes: number[]) {
+  for (const fontSize of sizes) {
+    const lines = wrapWithFont(font, value, fontSize, maxWidth);
+    if (lines.length <= maxLines) return { lines, fontSize };
+  }
+  const fontSize = sizes.at(-1)!;
+  return { lines: wrapWithFont(font, value, fontSize, maxWidth), fontSize };
+}
+
+function fontPath(font: opentype.Font, value: string, x: number, y: number, fontSize: number, fill: string) {
+  const missing = [...value].filter((character) => !/\s/.test(character) && !font.hasChar(character));
+  if (missing.length) throw new Error(`The creative font does not support: ${[...new Set(missing)].join(" ")}`);
+  return `<path d="${font.getPath(value, x, y, fontSize).toPathData(2)}" fill="${fill}"/>`;
+}
+
+let rendererFontsPromise: Promise<{ sans: opentype.Font; mono: opentype.Font }> | null = null;
 
 function rendererFonts() {
   rendererFontsPromise ??= Promise.all([
     readFile(path.join(process.cwd(), "public/social-fonts/Geist-SemiBold.ttf")),
     readFile(path.join(process.cwd(), "public/social-fonts/GeistMono-Medium.ttf")),
-  ]).then(([sans, mono]) => ({ sans, mono }));
+  ]).then(([sans, mono]) => ({
+    sans: opentype.parse(sans.buffer.slice(sans.byteOffset, sans.byteOffset + sans.byteLength)),
+    mono: opentype.parse(mono.buffer.slice(mono.byteOffset, mono.byteOffset + mono.byteLength)),
+  }));
   return rendererFontsPromise;
 }
 
@@ -177,44 +210,34 @@ export async function renderCreative(image: Buffer, brief: Pick<CreativeBrief, "
   const fonts = await rendererFonts();
   const content = typeof brief === "string" ? { headline: brief } : brief;
   const headline = normalizeDisplayText(content.headline);
-  const { lines, fontSize } = layoutHeadline(headline);
+  const { lines, fontSize } = layoutWithFont(fonts.sans, headline, 520, 4, [92, 84, 76, 68, 60, 52, 46, 40, 36, 32, 28]);
   const headlineTop = 245;
-  const headlineSvg = lines.map((line, index) => `<text x="76" y="${headlineTop + index * (fontSize + 5)}">${xml(line)}</text>`).join("");
+  const headlineSvg = lines.map((line, index) => fontPath(fonts.sans, line, 76, headlineTop + index * (fontSize + 5), fontSize, "#121820")).join("");
   const support = content.onImageSupport ? normalizeDisplayText(content.onImageSupport) : "";
-  const supportLayout = support ? layoutSupport(support) : { lines: [], fontSize: 29 };
+  const supportLayout = support ? layoutWithFont(fonts.sans, support, 500, 3, [29, 27, 25, 23, 21, 19, 17, 16]) : { lines: [], fontSize: 29 };
   const supportLines = supportLayout.lines;
   const supportTop = headlineTop + lines.length * (fontSize + 5) + 24;
   const supportLineHeight = supportLayout.fontSize + 8;
-  const supportSvg = supportLines.map((line, index) => `<text class="support" x="76" y="${supportTop + index * supportLineHeight}">${xml(line)}</text>`).join("");
+  const supportSvg = supportLines.map((line, index) => fontPath(fonts.sans, line, 76, supportTop + index * supportLineHeight, supportLayout.fontSize, "#343B43")).join("");
+  const kicker = normalizeDisplayText(content.onImageKicker || "FIELD NOTE").toUpperCase();
   const panelHeight = Math.max(610, supportTop + supportLines.length * supportLineHeight + 58);
   const svg = `<svg width="1080" height="1350" xmlns="http://www.w3.org/2000/svg">
     <defs><clipPath id="copy-safe"><rect x="76" y="130" width="560" height="1000"/></clipPath></defs>
-    <style>
-      text { font-family: Geist, sans-serif; fill: #121820; font-size: ${fontSize}px; font-weight: 600; letter-spacing: -2px; }
-      .meta { font-family: 'Geist Mono', monospace; font-size: 16px; letter-spacing: 2.4px; font-weight: 500; }
-      .kicker { font-family: 'Geist Mono', monospace; fill: #2457E6; font-size: 19px; letter-spacing: 2.8px; font-weight: 500; }
-      .support { font-family: Geist, sans-serif; fill: #343B43; font-size: ${supportLayout.fontSize}px; letter-spacing: -0.4px; font-weight: 400; }
-    </style>
     <rect width="1080" height="1350" fill="none"/>
     <rect x="0" y="0" width="760" height="${panelHeight}" fill="#F4F1EA"/>
     <rect x="0" y="0" width="18" height="${panelHeight}" fill="#2457E6"/>
     <line x1="76" y1="120" x2="654" y2="120" stroke="#121820" stroke-width="2"/>
-    <text class="meta" x="76" y="92">BAYLINE / FIELD NOTE</text>
+    ${fontPath(fonts.mono, "BAYLINE / FIELD NOTE", 76, 92, 16, "#121820")}
     <g clip-path="url(#copy-safe)">
-      <text class="kicker" x="76" y="170">${xml(normalizeDisplayText(content.onImageKicker || "FIELD NOTE").toUpperCase())}</text>
+      ${fontPath(fonts.mono, kicker, 76, 170, 19, "#2457E6")}
       ${headlineSvg}
       ${supportSvg}
     </g>
     <rect x="0" y="1242" width="1080" height="108" fill="#F4F1EA"/>
     <line x1="0" y1="1242" x2="1080" y2="1242" stroke="#121820" stroke-width="2"/>
-    <text class="meta" x="790" y="1307">BAYLINEDIGITAL.COM</text>
+    ${fontPath(fonts.mono, "BAYLINEDIGITAL.COM", 790, 1307, 16, "#121820")}
   </svg>`;
-  const fontOptions = {
-    fontBuffers: [fonts.sans, fonts.mono],
-    defaultFontFamily: "Geist",
-    loadSystemFonts: false,
-  } as NonNullable<NonNullable<ConstructorParameters<typeof Resvg>[1]>["font"]> & { fontBuffers: Buffer[] };
-  const overlay = Buffer.from(new Resvg(svg, { font: fontOptions }).render().asPng());
+  const overlay = Buffer.from(new Resvg(svg).render().asPng());
   const logo = await sharp(path.join(process.cwd(), "public/bayline-logo-cropped.png")).resize({ width: 250 }).png().toBuffer();
 
   return sharp(image)
