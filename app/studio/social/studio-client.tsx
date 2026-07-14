@@ -105,6 +105,8 @@ export function StudioClient({ data }: { data: StudioData }) {
       if (!response.ok || !result.ok) throw new Error(result.message);
       setToast(result.message);
       startTransition(() => router.refresh());
+    } catch (error) {
+      setToast(error instanceof Error ? error.message : "Something went wrong.");
     } finally {
       if (timer) window.clearInterval(timer);
       setRequestCount((count) => Math.max(0, count - 1));

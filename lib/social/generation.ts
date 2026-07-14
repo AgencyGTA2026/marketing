@@ -94,7 +94,23 @@ function assertBriefQuality(brief: z.infer<typeof BriefSchema>) {
 }
 
 function normalizeDisplayText(value: string) {
-  return value.normalize("NFKC").replace(/[\u0000-\u001F\u007F]/g, " ").replace(/\s+/g, " ").trim();
+  return value
+    .normalize("NFKC")
+    .replace(/[\u2010-\u2015\u2212]/g, "-")
+    .replace(/[\u2018-\u201B\u2032]/g, "'")
+    .replace(/[\u201C-\u201F\u2033]/g, '"')
+    .replace(/\u2026/g, "...")
+    .replace(/[\u0000-\u001F\u007F]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function fontSafeText(font: opentype.Font, value: string) {
+  return [...normalizeDisplayText(value)].map((character) => {
+    if (/\s/.test(character) || font.hasChar(character)) return character;
+    const ascii = character.normalize("NFKD").replace(/\p{M}/gu, "");
+    return [...ascii].filter((candidate) => font.hasChar(candidate)).join("");
+  }).join("").replace(/\s+/g, " ").trim();
 }
 
 export function wrapHeadline(headline: string, max = 20) {
@@ -188,9 +204,8 @@ function layoutWithFont(font: opentype.Font, value: string, maxWidth: number, ma
 }
 
 function fontPath(font: opentype.Font, value: string, x: number, y: number, fontSize: number, fill: string) {
-  const missing = [...value].filter((character) => !/\s/.test(character) && !font.hasChar(character));
-  if (missing.length) throw new Error(`The creative font does not support: ${[...new Set(missing)].join(" ")}`);
-  return `<path d="${font.getPath(value, x, y, fontSize).toPathData(2)}" fill="${fill}"/>`;
+  const safeValue = fontSafeText(font, value);
+  return `<path d="${font.getPath(safeValue, x, y, fontSize).toPathData(2)}" fill="${fill}"/>`;
 }
 
 let rendererFontsPromise: Promise<{ sans: opentype.Font; mono: opentype.Font }> | null = null;
@@ -209,17 +224,17 @@ function rendererFonts() {
 export async function renderCreative(image: Buffer, brief: Pick<CreativeBrief, "headline" | "onImageKicker" | "onImageSupport"> | string) {
   const fonts = await rendererFonts();
   const content = typeof brief === "string" ? { headline: brief } : brief;
-  const headline = normalizeDisplayText(content.headline);
+  const headline = fontSafeText(fonts.sans, content.headline);
   const { lines, fontSize } = layoutWithFont(fonts.sans, headline, 520, 4, [92, 84, 76, 68, 60, 52, 46, 40, 36, 32, 28]);
   const headlineTop = 245;
   const headlineSvg = lines.map((line, index) => fontPath(fonts.sans, line, 76, headlineTop + index * (fontSize + 5), fontSize, "#121820")).join("");
-  const support = content.onImageSupport ? normalizeDisplayText(content.onImageSupport) : "";
+  const support = content.onImageSupport ? fontSafeText(fonts.sans, content.onImageSupport) : "";
   const supportLayout = support ? layoutWithFont(fonts.sans, support, 500, 3, [29, 27, 25, 23, 21, 19, 17, 16]) : { lines: [], fontSize: 29 };
   const supportLines = supportLayout.lines;
   const supportTop = headlineTop + lines.length * (fontSize + 5) + 24;
   const supportLineHeight = supportLayout.fontSize + 8;
   const supportSvg = supportLines.map((line, index) => fontPath(fonts.sans, line, 76, supportTop + index * supportLineHeight, supportLayout.fontSize, "#343B43")).join("");
-  const kicker = normalizeDisplayText(content.onImageKicker || "FIELD NOTE").toUpperCase();
+  const kicker = fontSafeText(fonts.mono, content.onImageKicker || "FIELD NOTE").toUpperCase();
   const panelHeight = Math.max(610, supportTop + supportLines.length * supportLineHeight + 58);
   const svg = `<svg width="1080" height="1350" xmlns="http://www.w3.org/2000/svg">
     <defs><clipPath id="copy-safe"><rect x="76" y="130" width="560" height="1000"/></clipPath></defs>
