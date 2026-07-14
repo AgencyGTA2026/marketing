@@ -4,6 +4,7 @@ import path from "node:path";
 import OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
 import { put } from "@vercel/blob";
+import { Resvg } from "@resvg/resvg-js";
 import sharp from "sharp";
 import { z } from "zod";
 import { and, desc, eq, isNull, lt, or } from "drizzle-orm";
@@ -146,13 +147,13 @@ function layoutSupport(value: string, maxWidth = 500) {
   return { lines: wrapToPixelWidth(value, 21, maxWidth), fontSize: 21 };
 }
 
-let rendererFontsPromise: Promise<{ sans: string; mono: string }> | null = null;
+let rendererFontsPromise: Promise<{ sans: Buffer; mono: Buffer }> | null = null;
 
 function rendererFonts() {
   rendererFontsPromise ??= Promise.all([
     readFile(path.join(process.cwd(), "public/social-fonts/Geist-SemiBold.ttf")),
     readFile(path.join(process.cwd(), "public/social-fonts/GeistMono-Medium.ttf")),
-  ]).then(([sans, mono]) => ({ sans: sans.toString("base64"), mono: mono.toString("base64") }));
+  ]).then(([sans, mono]) => ({ sans, mono }));
   return rendererFontsPromise;
 }
 
@@ -168,14 +169,12 @@ export async function renderCreative(image: Buffer, brief: Pick<CreativeBrief, "
   const supportLineHeight = supportLayout.fontSize + 8;
   const supportSvg = supportLines.map((line, index) => `<text class="support" x="76" y="${supportTop + index * supportLineHeight}">${xml(line)}</text>`).join("");
   const panelHeight = Math.max(610, supportTop + supportLines.length * supportLineHeight + 58);
-  const svg = Buffer.from(`<svg width="1080" height="1350" xmlns="http://www.w3.org/2000/svg">
+  const svg = `<svg width="1080" height="1350" xmlns="http://www.w3.org/2000/svg">
     <defs><clipPath id="copy-safe"><rect x="76" y="130" width="560" height="1000"/></clipPath></defs>
     <style>
-      @font-face { font-family: Geist; src: url('data:font/ttf;base64,${fonts.sans}') format('truetype'); font-weight: 600; }
-      @font-face { font-family: GeistMono; src: url('data:font/ttf;base64,${fonts.mono}') format('truetype'); font-weight: 500; }
       text { font-family: Geist, sans-serif; fill: #121820; font-size: ${fontSize}px; font-weight: 600; letter-spacing: -2px; }
-      .meta { font-family: GeistMono, monospace; font-size: 16px; letter-spacing: 2.4px; font-weight: 500; }
-      .kicker { font-family: GeistMono, monospace; fill: #2457E6; font-size: 19px; letter-spacing: 2.8px; font-weight: 500; }
+      .meta { font-family: 'Geist Mono', monospace; font-size: 16px; letter-spacing: 2.4px; font-weight: 500; }
+      .kicker { font-family: 'Geist Mono', monospace; fill: #2457E6; font-size: 19px; letter-spacing: 2.8px; font-weight: 500; }
       .support { font-family: Geist, sans-serif; fill: #343B43; font-size: ${supportLayout.fontSize}px; letter-spacing: -0.4px; font-weight: 400; }
     </style>
     <rect width="1080" height="1350" fill="none"/>
@@ -191,12 +190,21 @@ export async function renderCreative(image: Buffer, brief: Pick<CreativeBrief, "
     <rect x="0" y="1242" width="1080" height="108" fill="#F4F1EA"/>
     <line x1="0" y1="1242" x2="1080" y2="1242" stroke="#121820" stroke-width="2"/>
     <text class="meta" x="790" y="1307">BAYLINEDIGITAL.COM</text>
-  </svg>`);
+  </svg>`;
+  // resvg supports in-memory fonts even though its published Node types omit the 2.5+ option.
+  const fontOptions = {
+    fontBuffers: [fonts.sans, fonts.mono],
+    defaultFontFamily: "Geist",
+    loadSystemFonts: false,
+  } as NonNullable<NonNullable<ConstructorParameters<typeof Resvg>[1]>["font"]> & { fontBuffers: Buffer[] };
+  const overlay = Buffer.from(new Resvg(svg, {
+    font: fontOptions,
+  }).render().asPng());
   const logo = await sharp(path.join(process.cwd(), "public/bayline-logo-cropped.png")).resize({ width: 250 }).png().toBuffer();
 
   return sharp(image)
     .resize(1080, 1350, { fit: "cover" })
-    .composite([{ input: svg, top: 0, left: 0 }, { input: logo, top: 1268, left: 76 }])
+    .composite([{ input: overlay, top: 0, left: 0 }, { input: logo, top: 1268, left: 76 }])
     .png({ compressionLevel: 9, palette: false })
     .toBuffer();
 }
