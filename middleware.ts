@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { hostnameFromHostHeader, isLoopbackHostname } from "@/lib/local-studio";
+import { hostnameFromHostHeader, isStudioHostname } from "@/lib/local-studio";
 
 export function middleware(request: NextRequest) {
   const hostHeader = request.headers.get("host") || request.headers.get("x-forwarded-host") || request.nextUrl.hostname;
-  if (!isLoopbackHostname(hostnameFromHostHeader(hostHeader))) {
+  if (!isStudioHostname(hostnameFromHostHeader(hostHeader))) {
     return new NextResponse("Not Found", {
       status: 404,
       headers: { "Cache-Control": "no-store", "X-Robots-Tag": "noindex, nofollow" },

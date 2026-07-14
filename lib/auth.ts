@@ -11,12 +11,16 @@ function resendClient() {
   return new Resend(process.env.RESEND_API_KEY);
 }
 
+const authBaseURL = process.env.BETTER_AUTH_URL
+  || process.env.SITE_URL
+  || (process.env.NEXT_PHASE === "phase-production-build" ? "http://localhost:3000" : undefined);
+
 export const auth = betterAuth({
   appName: "Bayline Digital Social Studio",
-  baseURL: process.env.BETTER_AUTH_URL || (process.env.NEXT_PHASE === "phase-production-build" ? "http://localhost:3000" : undefined),
+  baseURL: authBaseURL,
   secret: process.env.BETTER_AUTH_SECRET || (process.env.NEXT_PHASE === "phase-production-build" ? "bayline-build-only-secret-not-used-runtime" : undefined),
   database: drizzleAdapter(db, { provider: "pg", schema }),
-  trustedOrigins: [process.env.BETTER_AUTH_URL || "http://localhost:3000"],
+  trustedOrigins: [authBaseURL || "http://localhost:3000"],
   emailAndPassword: { enabled: false },
   session: {
     expiresIn: 60 * 60 * 24 * 7,
@@ -25,9 +29,7 @@ export const auth = betterAuth({
   },
   rateLimit: { enabled: true, window: 60, max: 10, storage: "memory" },
   advanced: {
-    // The Studio is loopback-only and uses the local HTTP origin, including
-    // when served with `next start` for a production-mode local check.
-    useSecureCookies: false,
+    useSecureCookies: authBaseURL?.startsWith("https://") ?? false,
     // The PostgreSQL adapter delegates the string "uuid" strategy to the
     // database. Our Better Auth IDs are text columns, so generate UUID strings
     // explicitly instead of requiring database-side UUID defaults.

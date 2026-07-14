@@ -6,6 +6,22 @@ export function isLoopbackHostname(hostname: string) {
     || normalized === "::1";
 }
 
+export function isStudioHostname(hostname: string, configured = [
+  process.env.STUDIO_ALLOWED_HOSTS,
+  process.env.BETTER_AUTH_URL,
+  process.env.SITE_URL,
+].filter(Boolean).join(",")) {
+  if (isLoopbackHostname(hostname)) return true;
+  const normalized = hostnameFromHostHeader(hostname);
+  const allowed = configured.split(",").map((entry) => {
+    const value = entry.trim();
+    if (!value) return "";
+    try { return new URL(value.includes("://") ? value : `https://${value}`).hostname.toLowerCase(); }
+    catch { return ""; }
+  });
+  return allowed.includes(normalized);
+}
+
 export function hostnameFromHostHeader(host: string) {
   const value = host.trim().toLowerCase();
   if (value.startsWith("[")) {

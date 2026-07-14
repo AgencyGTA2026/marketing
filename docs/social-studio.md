@@ -1,8 +1,8 @@
 # Bayline Digital Social Studio
 
-Local-only, single-owner workspace at `http://localhost:3000/studio/social` for generating, approving, scheduling, and publishing Bayline Digital static image posts to Facebook and Instagram. AutoBlogWriter is intentionally not part of this workflow.
+Private, single-owner workspace at `/studio/social` for generating, approving, scheduling, and publishing Bayline Digital static image posts to Facebook and Instagram. It supports localhost and explicitly configured production hostnames. AutoBlogWriter is intentionally not part of this workflow.
 
-The middleware returns `404` for every Studio page, auth route, and Studio API request made through a non-loopback hostname. The public Bayline Digital website can be deployed from the same repository without exposing the Studio. Generated image assets remain public because Meta must fetch them server-to-server when publishing.
+The middleware returns `404` for every Studio page, auth route, and Studio API request made through a hostname not listed by `STUDIO_ALLOWED_HOSTS`, `BETTER_AUTH_URL`, or `SITE_URL`. Authentication remains restricted to the exact `STUDIO_OWNER_EMAIL`. Generated image assets remain public because Meta must fetch them server-to-server when publishing.
 
 ## What ships
 
@@ -94,6 +94,6 @@ This pass requires real external accounts and cannot be completed with repositor
 7. Force an Instagram failure after Facebook succeeds, retry, and verify Facebook is not duplicated.
 8. Leave a due draft unapproved; verify it becomes `MISSED`, neither platform receives a post, and the owner receives email.
 9. Expire/revoke a test token and verify connection health/error treatment. Pause/resume an automation and reschedule a draft.
-10. Confirm `/studio/social`, `/api/studio/*`, and `/api/auth/*` return `404` through any non-loopback hostname, then repeat the primary paths at desktop and 375px mobile widths.
+10. Confirm the Studio works on localhost and configured production hosts, while `/studio/social`, `/api/studio/*`, and `/api/auth/*` return `404` on an unlisted preview hostname. Repeat the primary paths at desktop and 375px mobile widths.
 
 Do not connect the production Page until this acceptance pass is complete.

@@ -25,6 +25,6 @@ export async function requireStudioApi(request?: Request) {
 
 export function assertSameOrigin(request: Request) {
   const origin = request.headers.get("origin");
-  const expected = process.env.BETTER_AUTH_URL;
+  const expected = process.env.BETTER_AUTH_URL || process.env.SITE_URL;
   if (origin && expected && new URL(origin).origin !== new URL(expected).origin) throw new Error("INVALID_ORIGIN");
 }

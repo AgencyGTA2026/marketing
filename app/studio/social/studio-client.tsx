@@ -124,7 +124,7 @@ export function StudioClient({ data }: { data: StudioData }) {
       <header className="studio-topbar">
         <button className="studio-mobile-menu" onClick={() => setMobileNav(!mobileNav)} aria-label="Toggle navigation"><Menu size={19} /></button>
         <div className="studio-wordmark"><span>{"//"}</span> BAYLINE DIGITAL <b>/ SOCIAL</b></div>
-        <div className="studio-topbar-center"><span className="studio-live-dot" />LOCAL STUDIO <i /> LOOPBACK ONLY</div>
+        <div className="studio-topbar-center"><span className="studio-live-dot" />PRIVATE STUDIO <i /> OWNER ONLY</div>
         <div className="studio-owner"><span>{data.ownerEmail}</span><button onClick={() => authClient.signOut({ fetchOptions: { onSuccess: () => router.push("/studio/sign-in") } })} aria-label="Sign out"><LogOut size={15} /></button></div>
       </header>
 
