@@ -1,7 +1,10 @@
 import "server-only";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
 import { put } from "@vercel/blob";
+import { Resvg } from "@resvg/resvg-js";
 import sharp from "sharp";
 import { z } from "zod";
 import { and, desc, eq, isNull, lt, or } from "drizzle-orm";
@@ -60,9 +63,9 @@ function openaiClient() {
 }
 
 const BriefSchema = z.object({
-  headline: z.string().min(4).max(52),
-  onImageKicker: z.string().min(3).max(22),
-  onImageSupport: z.string().min(12).max(90),
+  headline: z.string().min(4).max(84),
+  onImageKicker: z.string().min(3).max(30),
+  onImageSupport: z.string().min(12).max(120),
   visualBrief: z.string().min(20).max(700),
   facebookCaption: z.string().min(20).max(1800),
   instagramCaption: z.string().min(20).max(1800),
@@ -89,6 +92,14 @@ function assertBriefQuality(brief: z.infer<typeof BriefSchema>) {
   }
 }
 
+function xml(value: string) {
+  return value.replace(/[<>&'"]/g, (character) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", "'": "&apos;", '"': "&quot;" })[character]!);
+}
+
+function normalizeDisplayText(value: string) {
+  return value.normalize("NFKC").replace(/[\u0000-\u001F\u007F]/g, " ").replace(/\s+/g, " ").trim();
+}
+
 export function wrapHeadline(headline: string, max = 20) {
   const words = headline.trim().split(/\s+/);
   const lines: string[] = [];
@@ -113,7 +124,20 @@ function estimatedLineWidth(value: string, fontSize: number) {
 
 function wrapToPixelWidth(value: string, fontSize: number, maxWidth: number) {
   const lines: string[] = [];
-  for (const word of value.trim().split(/\s+/).filter(Boolean)) {
+  const words = normalizeDisplayText(value).split(/\s+/).filter(Boolean).flatMap((word) => {
+    if (estimatedLineWidth(word, fontSize) <= maxWidth) return [word];
+    const pieces: string[] = [];
+    let piece = "";
+    for (const character of word) {
+      if (piece && estimatedLineWidth(`${piece}${character}`, fontSize) > maxWidth) {
+        pieces.push(piece);
+        piece = character;
+      } else piece += character;
+    }
+    if (piece) pieces.push(piece);
+    return pieces;
+  });
+  for (const word of words) {
     const current = lines.at(-1);
     const candidate = current ? `${current} ${word}` : word;
     if (!current) lines.push(word);
@@ -124,19 +148,78 @@ function wrapToPixelWidth(value: string, fontSize: number, maxWidth: number) {
 }
 
 export function layoutHeadline(headline: string, maxWidth = 520) {
-  for (const fontSize of [92, 84, 76, 68, 60, 52, 46]) {
+  for (const fontSize of [92, 84, 76, 68, 60, 52, 46, 40, 36, 32, 28]) {
     const lines = wrapToPixelWidth(headline, fontSize, maxWidth);
     if (lines.length <= 4 && lines.every((line) => estimatedLineWidth(line, fontSize) <= maxWidth)) return { lines, fontSize };
   }
-  return { lines: wrapToPixelWidth(headline, 42, maxWidth), fontSize: 42 };
+  return { lines: wrapToPixelWidth(headline, 26, maxWidth), fontSize: 26 };
 }
 
-export async function renderCreative(image: Buffer, _brief?: Pick<CreativeBrief, "headline" | "onImageKicker" | "onImageSupport"> | string) {
-  void _brief;
-  const accent = Buffer.from('<svg width="18" height="1350" xmlns="http://www.w3.org/2000/svg"><rect width="18" height="1350" fill="#2457E6"/></svg>');
+function layoutSupport(value: string, maxWidth = 500) {
+  for (const fontSize of [29, 27, 25, 23, 21, 19, 17]) {
+    const lines = wrapToPixelWidth(value, fontSize, maxWidth);
+    if (lines.length <= 3 && lines.every((line) => estimatedLineWidth(line, fontSize) <= maxWidth)) return { lines, fontSize };
+  }
+  return { lines: wrapToPixelWidth(value, 16, maxWidth), fontSize: 16 };
+}
+
+let rendererFontsPromise: Promise<{ sans: Buffer; mono: Buffer }> | null = null;
+
+function rendererFonts() {
+  rendererFontsPromise ??= Promise.all([
+    readFile(path.join(process.cwd(), "public/social-fonts/Geist-SemiBold.ttf")),
+    readFile(path.join(process.cwd(), "public/social-fonts/GeistMono-Medium.ttf")),
+  ]).then(([sans, mono]) => ({ sans, mono }));
+  return rendererFontsPromise;
+}
+
+export async function renderCreative(image: Buffer, brief: Pick<CreativeBrief, "headline" | "onImageKicker" | "onImageSupport"> | string) {
+  const fonts = await rendererFonts();
+  const content = typeof brief === "string" ? { headline: brief } : brief;
+  const headline = normalizeDisplayText(content.headline);
+  const { lines, fontSize } = layoutHeadline(headline);
+  const headlineTop = 245;
+  const headlineSvg = lines.map((line, index) => `<text x="76" y="${headlineTop + index * (fontSize + 5)}">${xml(line)}</text>`).join("");
+  const support = content.onImageSupport ? normalizeDisplayText(content.onImageSupport) : "";
+  const supportLayout = support ? layoutSupport(support) : { lines: [], fontSize: 29 };
+  const supportLines = supportLayout.lines;
+  const supportTop = headlineTop + lines.length * (fontSize + 5) + 24;
+  const supportLineHeight = supportLayout.fontSize + 8;
+  const supportSvg = supportLines.map((line, index) => `<text class="support" x="76" y="${supportTop + index * supportLineHeight}">${xml(line)}</text>`).join("");
+  const panelHeight = Math.max(610, supportTop + supportLines.length * supportLineHeight + 58);
+  const svg = `<svg width="1080" height="1350" xmlns="http://www.w3.org/2000/svg">
+    <defs><clipPath id="copy-safe"><rect x="76" y="130" width="560" height="1000"/></clipPath></defs>
+    <style>
+      text { font-family: Geist, sans-serif; fill: #121820; font-size: ${fontSize}px; font-weight: 600; letter-spacing: -2px; }
+      .meta { font-family: 'Geist Mono', monospace; font-size: 16px; letter-spacing: 2.4px; font-weight: 500; }
+      .kicker { font-family: 'Geist Mono', monospace; fill: #2457E6; font-size: 19px; letter-spacing: 2.8px; font-weight: 500; }
+      .support { font-family: Geist, sans-serif; fill: #343B43; font-size: ${supportLayout.fontSize}px; letter-spacing: -0.4px; font-weight: 400; }
+    </style>
+    <rect width="1080" height="1350" fill="none"/>
+    <rect x="0" y="0" width="760" height="${panelHeight}" fill="#F4F1EA"/>
+    <rect x="0" y="0" width="18" height="${panelHeight}" fill="#2457E6"/>
+    <line x1="76" y1="120" x2="654" y2="120" stroke="#121820" stroke-width="2"/>
+    <text class="meta" x="76" y="92">BAYLINE / FIELD NOTE</text>
+    <g clip-path="url(#copy-safe)">
+      <text class="kicker" x="76" y="170">${xml(normalizeDisplayText(content.onImageKicker || "FIELD NOTE").toUpperCase())}</text>
+      ${headlineSvg}
+      ${supportSvg}
+    </g>
+    <rect x="0" y="1242" width="1080" height="108" fill="#F4F1EA"/>
+    <line x1="0" y1="1242" x2="1080" y2="1242" stroke="#121820" stroke-width="2"/>
+    <text class="meta" x="790" y="1307">BAYLINEDIGITAL.COM</text>
+  </svg>`;
+  const fontOptions = {
+    fontBuffers: [fonts.sans, fonts.mono],
+    defaultFontFamily: "Geist",
+    loadSystemFonts: false,
+  } as NonNullable<NonNullable<ConstructorParameters<typeof Resvg>[1]>["font"]> & { fontBuffers: Buffer[] };
+  const overlay = Buffer.from(new Resvg(svg, { font: fontOptions }).render().asPng());
+  const logo = await sharp(path.join(process.cwd(), "public/bayline-logo-cropped.png")).resize({ width: 250 }).png().toBuffer();
+
   return sharp(image)
     .resize(1080, 1350, { fit: "cover" })
-    .composite([{ input: accent, top: 0, left: 0 }])
+    .composite([{ input: overlay, top: 0, left: 0 }, { input: logo, top: 1268, left: 76 }])
     .png({ compressionLevel: 9, palette: false })
     .toBuffer();
 }
@@ -164,26 +247,7 @@ async function createBrief(spec: typeof automation.$inferSelect.promptSpec, extr
 }
 
 async function createImage(brief: CreativeBrief) {
-  const prompt = `${BRAND_BRIEF}
-
-Create the complete finished 1080 × 1350 social graphic. Render every line below directly in the image using proper English characters. Copy the wording exactly—do not rewrite, omit, duplicate, add, or misspell anything.
-
-TEXT TO RENDER:
-Small top label: "BAYLINE / FIELD NOTE"
-Blue category kicker: "${(brief.onImageKicker || "FIELD NOTE").toUpperCase()}"
-Main headline: "${brief.headline}"
-Supporting sentence: "${brief.onImageSupport || ""}"
-Small footer label: "BAYLINEDIGITAL.COM"
-
-LAYOUT REQUIREMENTS:
-- Keep all text horizontally aligned to one left edge.
-- Keep every character fully inside generous safe margins; no text may touch or cross an edge.
-- Use no more than three balanced lines for the main headline.
-- Keep the supporting sentence visually separate beneath the headline.
-- Make the complete English copy immediately readable at social-feed size.
-- Include no other words, letters, numbers, logos, signatures, or watermarks.
-
-Visual direction: ${brief.visualBrief}`;
+  const prompt = `${BRAND_BRIEF}\n\nVisual direction: ${brief.visualBrief}\nDo not render this headline or any other text: ${brief.headline}`;
   const generated = await openaiClient().images.generate({
     model: "gpt-image-2",
     prompt,
@@ -273,31 +337,16 @@ export async function generateDraftVersion(draftId: string, extra?: string) {
 export async function editDraftVersion(draftId: string, input: { headline: string; facebookCaption: string; instagramCaption: string }) {
   const [current] = await db.select().from(draftVersion).innerJoin(draft, and(eq(draft.currentVersionId, draftVersion.id), eq(draft.id, draftId))).limit(1);
   if (!current) throw new Error("Current version not found");
+  const sourceUrl = current.social_draft_version.sourceImageUrl;
+  if (!sourceUrl) throw new Error("Source artwork is unavailable");
+  const sourceResponse = await fetch(sourceUrl);
+  if (!sourceResponse.ok) throw new Error("Unable to read source artwork");
+  const source = Buffer.from(await sourceResponse.arrayBuffer());
   const nextVersion = current.social_draft_version.version + 1;
-  const brief = { ...current.social_draft_version.brief, headline: input.headline, facebookCaption: input.facebookCaption, instagramCaption: input.instagramCaption };
-  const headlineChanged = input.headline !== current.social_draft_version.brief.headline;
-  let source: Buffer;
-  let final: Buffer;
-  let imagePrompt = current.social_draft_version.imagePrompt;
-
-  if (headlineChanged) {
-    const generated = await createImage(brief);
-    source = generated.image;
-    final = await renderCreative(generated.image);
-    imagePrompt = generated.prompt;
-  } else {
-    const [sourceResponse, finalResponse] = await Promise.all([
-      fetch(current.social_draft_version.sourceImageUrl || current.social_draft_version.assetUrl),
-      fetch(current.social_draft_version.assetUrl),
-    ]);
-    if (!sourceResponse.ok || !finalResponse.ok) throw new Error("Unable to read the current artwork");
-    [source, final] = await Promise.all([
-      sourceResponse.arrayBuffer().then((buffer) => Buffer.from(buffer)),
-      finalResponse.arrayBuffer().then((buffer) => Buffer.from(buffer)),
-    ]);
-  }
+  const final = await renderCreative(source, { ...current.social_draft_version.brief, headline: input.headline });
   const blobs = await uploadVersionAssets(draftId, nextVersion, source, final);
   const versionId = crypto.randomUUID();
+  const brief = { ...current.social_draft_version.brief, headline: input.headline, facebookCaption: input.facebookCaption, instagramCaption: input.instagramCaption };
   await db.transaction(async (tx) => {
     await tx.insert(draftVersion).values({
       ...current.social_draft_version,
@@ -306,7 +355,6 @@ export async function editDraftVersion(draftId: string, input: { headline: strin
       brief,
       facebookCaption: input.facebookCaption,
       instagramCaption: input.instagramCaption,
-      imagePrompt,
       sourceImageUrl: blobs.sourceBlob.url,
       assetUrl: blobs.finalBlob.url,
       assetPathname: blobs.finalBlob.pathname,

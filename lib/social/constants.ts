@@ -5,13 +5,13 @@ export const GRAPH_VERSION = process.env.META_GRAPH_VERSION || "v24.0";
 export const GRAPH_BASE_URL = `https://graph.facebook.com/${GRAPH_VERSION}`;
 
 export const BRAND_BRIEF = `
-Bayline Digital visual system. Create a complete, finished editorial social graphic.
+Bayline Digital visual system. Create an editorial, confident, quiet image layer.
 Use warm paper (#F4F1EA), deep ink (#121820), Bayline blue (#2457E6), square geometry,
-clean negative space, documentary or abstract editorial imagery, and crisp high contrast. Render
-the supplied English text as part of the finished image using a clean Swiss editorial layout,
-strong sans-serif typography, consistent left alignment, generous safe margins, and deliberate
-line breaks. Never add gradients, glass effects, fake software dashboards, device mockups,
-invented metrics, awards, client marks, or unsupported claims. Compose for a 4:5 portrait crop.
+clean negative space, documentary or abstract editorial imagery, and crisp high contrast.
+Never include any text, lettering, logos, gradients, glass effects, fake software dashboards,
+device mockups, invented metrics, awards, client marks, or unsupported claims. The final layout
+will add typography and the Bayline logo in code. Compose for a 4:5 portrait crop with calm
+space in the upper-left for an editorial headline.
 `.trim();
 
 export const AGENCY_CONTEXT = `
@@ -43,4 +43,4 @@ what to improve first. Never invent Bayline clients, results, statistics, awards
 capabilities. The voice is confident, useful, concise, candid, and calm—not loud or self-important.
 `.trim();
 
-export const CONTENT_PROMPT_VERSION = "bayline-social-v4-image-type";
+export const CONTENT_PROMPT_VERSION = "bayline-social-v3";
