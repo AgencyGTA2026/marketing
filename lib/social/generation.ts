@@ -1,4 +1,5 @@
 import "server-only";
+import { readFile } from "node:fs/promises";
 import path from "node:path";
 import OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
@@ -105,33 +106,88 @@ export function wrapHeadline(headline: string, max = 20) {
   return lines.slice(0, 4);
 }
 
+function estimatedLineWidth(value: string, fontSize: number) {
+  const units = [...value].reduce((total, character) => {
+    if (/\s/.test(character)) return total + 0.3;
+    if (/[MWmw@%]/.test(character)) return total + 0.9;
+    if (/[ilIjtfr1.,'’!:;]/.test(character)) return total + 0.34;
+    if (/[A-Z0-9]/.test(character)) return total + 0.64;
+    return total + 0.56;
+  }, 0);
+  return units * fontSize - Math.max(0, value.length - 1) * 2;
+}
+
+function wrapToPixelWidth(value: string, fontSize: number, maxWidth: number) {
+  const words = value.trim().split(/\s+/).filter(Boolean);
+  const lines: string[] = [];
+  for (const word of words) {
+    const current = lines.at(-1);
+    const candidate = current ? `${current} ${word}` : word;
+    if (!current) lines.push(word);
+    else if (estimatedLineWidth(candidate, fontSize) <= maxWidth) lines[lines.length - 1] = candidate;
+    else lines.push(word);
+  }
+  return lines;
+}
+
+export function layoutHeadline(headline: string, maxWidth = 520) {
+  for (const fontSize of [92, 84, 76, 68, 60, 52, 46]) {
+    const lines = wrapToPixelWidth(headline, fontSize, maxWidth);
+    if (lines.length <= 4 && lines.every((line) => estimatedLineWidth(line, fontSize) <= maxWidth)) return { lines, fontSize };
+  }
+  return { lines: wrapToPixelWidth(headline, 42, maxWidth), fontSize: 42 };
+}
+
+function layoutSupport(value: string, maxWidth = 500) {
+  for (const fontSize of [29, 27, 25, 23]) {
+    const lines = wrapToPixelWidth(value, fontSize, maxWidth);
+    if (lines.length <= 3 && lines.every((line) => estimatedLineWidth(line, fontSize) <= maxWidth)) return { lines, fontSize };
+  }
+  return { lines: wrapToPixelWidth(value, 21, maxWidth), fontSize: 21 };
+}
+
+let rendererFontsPromise: Promise<{ sans: string; mono: string }> | null = null;
+
+function rendererFonts() {
+  rendererFontsPromise ??= Promise.all([
+    readFile(path.join(process.cwd(), "public/social-fonts/Geist-SemiBold.ttf")),
+    readFile(path.join(process.cwd(), "public/social-fonts/GeistMono-Medium.ttf")),
+  ]).then(([sans, mono]) => ({ sans: sans.toString("base64"), mono: mono.toString("base64") }));
+  return rendererFontsPromise;
+}
+
 export async function renderCreative(image: Buffer, brief: Pick<CreativeBrief, "headline" | "onImageKicker" | "onImageSupport"> | string) {
+  const fonts = await rendererFonts();
   const content = typeof brief === "string" ? { headline: brief } : brief;
-  const lines = wrapHeadline(content.headline);
-  const fontSize = lines.length > 3 ? 74 : lines.length > 2 ? 82 : 92;
+  const { lines, fontSize } = layoutHeadline(content.headline);
   const headlineTop = 245;
   const headlineSvg = lines.map((line, index) => `<text x="76" y="${headlineTop + index * (fontSize + 5)}">${xml(line)}</text>`).join("");
-  const supportLines = content.onImageSupport ? wrapHeadline(content.onImageSupport, 38).slice(0, 3) : [];
+  const supportLayout = content.onImageSupport ? layoutSupport(content.onImageSupport) : { lines: [], fontSize: 29 };
+  const supportLines = supportLayout.lines;
   const supportTop = headlineTop + lines.length * (fontSize + 5) + 24;
-  const supportSvg = supportLines.map((line, index) => `<text class="support" x="76" y="${supportTop + index * 37}">${xml(line)}</text>`).join("");
-  const panelHeight = Math.max(610, supportTop + supportLines.length * 37 + 58);
+  const supportLineHeight = supportLayout.fontSize + 8;
+  const supportSvg = supportLines.map((line, index) => `<text class="support" x="76" y="${supportTop + index * supportLineHeight}">${xml(line)}</text>`).join("");
+  const panelHeight = Math.max(610, supportTop + supportLines.length * supportLineHeight + 58);
   const svg = Buffer.from(`<svg width="1080" height="1350" xmlns="http://www.w3.org/2000/svg">
+    <defs><clipPath id="copy-safe"><rect x="76" y="130" width="560" height="1000"/></clipPath></defs>
     <style>
-      @font-face { font-family: Geist; src: url('file://${path.join(process.cwd(), "node_modules/geist/dist/fonts/geist-sans/Geist-SemiBold.ttf")}'); font-weight: 600; }
-      @font-face { font-family: GeistMono; src: url('file://${path.join(process.cwd(), "node_modules/geist/dist/fonts/geist-mono/GeistMono-Medium.ttf")}'); }
+      @font-face { font-family: Geist; src: url('data:font/ttf;base64,${fonts.sans}') format('truetype'); font-weight: 600; }
+      @font-face { font-family: GeistMono; src: url('data:font/ttf;base64,${fonts.mono}') format('truetype'); font-weight: 500; }
       text { font-family: Geist, sans-serif; fill: #121820; font-size: ${fontSize}px; font-weight: 600; letter-spacing: -2px; }
       .meta { font-family: GeistMono, monospace; font-size: 16px; letter-spacing: 2.4px; font-weight: 500; }
       .kicker { font-family: GeistMono, monospace; fill: #2457E6; font-size: 19px; letter-spacing: 2.8px; font-weight: 500; }
-      .support { font-family: Geist, sans-serif; fill: #343B43; font-size: 29px; letter-spacing: -0.4px; font-weight: 400; }
+      .support { font-family: Geist, sans-serif; fill: #343B43; font-size: ${supportLayout.fontSize}px; letter-spacing: -0.4px; font-weight: 400; }
     </style>
     <rect width="1080" height="1350" fill="none"/>
     <rect x="0" y="0" width="760" height="${panelHeight}" fill="#F4F1EA"/>
     <rect x="0" y="0" width="18" height="${panelHeight}" fill="#2457E6"/>
     <line x1="76" y1="120" x2="654" y2="120" stroke="#121820" stroke-width="2"/>
     <text class="meta" x="76" y="92">BAYLINE / FIELD NOTE</text>
-    <text class="kicker" x="76" y="170">${xml((content.onImageKicker || "FIELD NOTE").toUpperCase())}</text>
-    ${headlineSvg}
-    ${supportSvg}
+    <g clip-path="url(#copy-safe)">
+      <text class="kicker" x="76" y="170">${xml((content.onImageKicker || "FIELD NOTE").toUpperCase())}</text>
+      ${headlineSvg}
+      ${supportSvg}
+    </g>
     <rect x="0" y="1242" width="1080" height="108" fill="#F4F1EA"/>
     <line x1="0" y1="1242" x2="1080" y2="1242" stroke="#121820" stroke-width="2"/>
     <text class="meta" x="790" y="1307">BAYLINEDIGITAL.COM</text>

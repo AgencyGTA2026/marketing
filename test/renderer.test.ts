@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import sharp from "sharp";
 import { describe, expect, it } from "vitest";
-import { hasMeaningfulSocialCopy, renderCreative, wrapHeadline } from "@/lib/social/generation";
+import { hasMeaningfulSocialCopy, layoutHeadline, renderCreative, wrapHeadline } from "@/lib/social/generation";
 
 describe("Bayline Digital 4:5 renderer", () => {
   it("rejects repeated-character model output before it can be published", () => {
@@ -14,6 +14,15 @@ describe("Bayline Digital 4:5 renderer", () => {
     const lines = wrapHeadline("A practical system for turning better websites into steady growth");
     expect(lines.length).toBeLessThanOrEqual(4);
     expect(lines.every((line) => line.length <= 25)).toBe(true);
+  });
+
+  it("wraps wide headline glyphs inside the image panel", () => {
+    expect(layoutHeadline("Make fast follow-up automatic")).toMatchObject({
+      lines: ["Make fast", "follow-up", "automatic"],
+    });
+    const long = layoutHeadline("Make every new website enquiry easier to qualify and follow up quickly");
+    expect(long.lines.length).toBeLessThanOrEqual(4);
+    expect(long.lines.join(" ")).toBe("Make every new website enquiry easier to qualify and follow up quickly");
   });
 
   it("produces a deterministic 1080×1350 PNG with required brand colors", async () => {
