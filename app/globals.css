@@ -422,7 +422,7 @@ button, summary, a { -webkit-tap-highlight-color: transparent; }
 .statement-inner p:last-child { border: 0; }
 .home-work, .home-approach { padding-block: 136px; }
 .home-section-title { display: grid; grid-template-columns: 1fr 1.55fr; gap: 100px; }
-.home-section-title h2, .automation-layout h2, .approach-heading h2 { margin: 0; font-size: 68px; line-height: 1; letter-spacing: 0; font-weight: 575; }
+.home-section-title h2, .automation-layout h2, .home-approach .section-heading h2 { margin: 0; font-size: 68px; line-height: 1; letter-spacing: 0; font-weight: 575; }
 .service-list { margin-top: 88px; border-top: 1px solid var(--ink); }
 .service-row { min-height: 250px; display: grid; grid-template-columns: 80px .8fr 1.2fr; gap: 48px; padding: 42px 0; border-bottom: 1px solid var(--rule); }
 .service-row > span { padding-top: 7px; color: var(--blue); font-family: var(--font-geist-mono); font-size: 10px; }
@@ -440,8 +440,6 @@ button, summary, a { -webkit-tap-highlight-color: transparent; }
 .sequence-item > span { width: 31px; height: 31px; display: grid; place-items: center; border: 1px solid #7799ff; border-radius: 50%; color: #9cb4ff; font-family: var(--font-geist-mono); font-size: 10px; }
 .sequence-item strong { font-size: 20px; font-weight: 560; }
 .sequence-item p { margin: 8px 0 0; color: #9fa6ae; font-size: 13px; line-height: 1.5; }
-.approach-heading { display: grid; grid-template-columns: .45fr 1fr .75fr; gap: 72px; }
-.approach-heading > p:last-child { margin: 0; color: #4e555c; font-size: 15px; line-height: 1.7; }
 .principles { display: grid; grid-template-columns: repeat(3,1fr); gap: 52px; margin: 100px 0 0 30%; }
 .principles article { padding-top: 18px; border-top: 1px solid var(--ink); }
 .principles span { color: var(--blue); font-family: var(--font-geist-mono); font-size: 10px; }
@@ -489,7 +487,7 @@ button, summary, a { -webkit-tap-highlight-color: transparent; }
 .four-steps h3 { margin: 38px 0 14px; font-size: 20px; font-weight: 560; }
 .four-steps p { margin: 0; color: #a9afb7; font-size: 13px; line-height: 1.65; }
 .ownership { padding-block: 130px; }
-.principle-rows { margin-top: 80px; margin-left: 30%; border-top: 1px solid var(--ink); }
+.principle-rows { margin-top: 80px; border-top: 1px solid var(--ink); }
 .principle-rows article { display: grid; grid-template-columns: .8fr 1.2fr; gap: 50px; padding: 30px 0; border-bottom: 1px solid var(--rule); }
 .principle-rows h3 { margin: 0; font-size: 22px; font-weight: 560; }
 .principle-rows p { margin: 0; color: var(--muted); line-height: 1.7; }
@@ -519,7 +517,7 @@ button, summary, a { -webkit-tap-highlight-color: transparent; }
 .deliverable-rows li { padding: 6px 0; }
 .process-band { color: white; }
 .process-rows article { grid-template-columns: 70px .8fr 1.2fr; }
-.technical-note { display: grid; grid-template-columns: .7fr 1.3fr; gap: 60px; margin: 90px 0 0 30%; padding-top: 30px; border-top: 1px solid #4a4f56; }
+.technical-note { display: grid; grid-template-columns: .7fr 1.3fr; gap: 60px; margin-top: 90px; padding-top: 30px; border-top: 1px solid #4a4f56; }
 .technical-note ul { margin: 0; padding: 0; list-style: none; color: #a9afb7; font-size: 13px; }
 .technical-note li { padding: 8px 0; border-bottom: 1px solid #343a41; }
 .detail-faq { display: grid; grid-template-columns: .8fr 1.2fr; gap: 100px; padding-block: 120px; }
@@ -667,7 +665,7 @@ button, summary, a { -webkit-tap-highlight-color: transparent; }
   .inquiry-layout { grid-template-columns: 1fr; gap: 60px; }
   .home-hero h1 { font-size: 82px; }
   .hero-bottom { width: 72%; }
-  .home-section-title, .automation-layout, .approach-heading, .contact-hero, .contact-faq { grid-template-columns: 1fr; gap: 44px; }
+  .home-section-title, .automation-layout, .contact-hero, .contact-faq { grid-template-columns: 1fr; gap: 44px; }
   .service-index-row, .service-detail-hero { grid-template-columns: 55px 1fr; }
   .service-index-row > div:last-child { grid-column: 2; }
   .service-detail-hero > div { grid-column: 1 / -1; }
@@ -719,7 +717,7 @@ button, summary, a { -webkit-tap-highlight-color: transparent; }
   .statement-inner { grid-template-columns: 1fr; padding-block: 25px; }
   .statement-inner p { padding: 14px 0; border-right: 0; border-bottom: 1px solid rgba(255,255,255,.3); }
   .home-work, .home-approach { padding-block: 88px; }
-  .home-section-title h2, .automation-layout h2, .approach-heading h2 { font-size: 46px; }
+  .home-section-title h2, .automation-layout h2, .home-approach .section-heading h2 { font-size: 46px; }
   .service-list { margin-top: 56px; }
   .service-row { min-height: auto; grid-template-columns: 38px 1fr; gap: 22px; padding: 34px 0; }
   .service-row h3 { font-size: 31px; }
