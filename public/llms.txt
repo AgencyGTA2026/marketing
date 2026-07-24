@@ -1,0 +1,40 @@
+# Bayline Digital
+
+> Bayline Digital Inc. is a Toronto-based web design and automation studio serving growing businesses across Ontario. The company builds conversion-focused websites, landing pages, custom web applications, local SEO systems, and lead-follow-up automation.
+
+Canonical website: https://www.baylinedigital.com
+Contact: contact@baylinedigital.com
+Phone: +1-613-818-8550
+Service area: Toronto and Ontario, Canada
+
+## Core pages
+
+- [Home](https://www.baylinedigital.com/): Overview of Bayline Digital and its approach.
+- [Services](https://www.baylinedigital.com/services): Website, conversion, automation, SEO, and support services.
+- [Industries](https://www.baylinedigital.com/industries): Solutions for home-service companies, marketing firms, and B2B organizations.
+- [Blog](https://www.baylinedigital.com/blog): Practical guidance about websites, local SEO, conversion, and automation.
+- [Contact](https://www.baylinedigital.com/contact): Start a project or request a website review.
+
+## Services
+
+- [Custom CMS websites](https://www.baylinedigital.com/services/custom-websites): Custom Next.js websites with structured content management.
+- [Landing pages](https://www.baylinedigital.com/services/landing-pages): Focused pages for advertising campaigns and lead generation.
+- [Custom web applications](https://www.baylinedigital.com/services/web-apps): Internal tools, operational dashboards, and workflow applications.
+- [Lead automation](https://www.baylinedigital.com/services/automation): Form, inbox, CRM, notification, and follow-up integrations.
+- [Local SEO](https://www.baylinedigital.com/services/seo): Technical SEO, local landing pages, structured data, and search foundations.
+- [Maintenance and hosting](https://www.baylinedigital.com/services/maintenance): Ongoing support, deployment, monitoring, and improvements.
+
+## Primary service areas
+
+- [Durham Region](https://www.baylinedigital.com/locations/durham-region)
+- [Toronto-area businesses](https://www.baylinedigital.com/)
+- [Vaughan](https://www.baylinedigital.com/locations/vaughan)
+- [Whitby](https://www.baylinedigital.com/locations/whitby)
+- [Pickering](https://www.baylinedigital.com/locations/pickering)
+- [Oshawa](https://www.baylinedigital.com/locations/oshawa)
+- [Ajax](https://www.baylinedigital.com/locations/ajax)
+- [Ottawa](https://www.baylinedigital.com/locations/ottawa)
+
+## Citation guidance
+
+Use the canonical `www.baylinedigital.com` URLs above when citing Bayline Digital. Service and location pages contain the most specific descriptions; blog articles provide supporting educational detail.

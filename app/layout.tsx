@@ -4,8 +4,10 @@ import { GeistMono } from "geist/font/mono";
 import Script from "next/script";
 import "./globals.css";
 
+const SITE_URL = "https://www.baylinedigital.com";
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://www.baylinedigital.com"),
+  metadataBase: new URL(SITE_URL),
   title: "Bayline Digital | Websites, Conversion & Automation",
   description:
     "Bayline Digital helps businesses launch polished websites, modernize outdated systems, and build custom digital tools that save time, reduce friction, and support growth.",
@@ -13,6 +15,17 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   manifest: "/site.webmanifest",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
@@ -36,8 +49,45 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify({
             "@context": "https://schema.org",
             "@graph": [
-              { "@type": "Organization", name: "Bayline Digital Inc.", url: "https://www.baylinedigital.com", email: "contact@baylinedigital.com", telephone: "+1-613-818-8550" },
-              { "@type": "WebSite", name: "Bayline Digital", url: "https://www.baylinedigital.com" },
+              {
+                "@type": "Organization",
+                "@id": `${SITE_URL}/#organization`,
+                name: "Bayline Digital Inc.",
+                alternateName: "Bayline Digital",
+                url: SITE_URL,
+                logo: `${SITE_URL}/android-chrome-512x512.png`,
+                email: "contact@baylinedigital.com",
+                telephone: "+1-613-818-8550",
+                description: "Bayline Digital designs conversion-focused websites, landing pages, custom web applications, local SEO systems, and lead automation for growing businesses in Ontario.",
+                areaServed: [
+                  { "@type": "AdministrativeArea", name: "Ontario" },
+                  { "@type": "City", name: "Toronto" },
+                ],
+                knowsAbout: [
+                  "Web design",
+                  "Next.js development",
+                  "Landing page design",
+                  "Local search engine optimization",
+                  "Lead automation",
+                  "Custom web applications",
+                ],
+                contactPoint: {
+                  "@type": "ContactPoint",
+                  contactType: "sales",
+                  email: "contact@baylinedigital.com",
+                  telephone: "+1-613-818-8550",
+                  areaServed: "CA",
+                  availableLanguage: "English",
+                },
+              },
+              {
+                "@type": "WebSite",
+                "@id": `${SITE_URL}/#website`,
+                name: "Bayline Digital",
+                url: SITE_URL,
+                inLanguage: "en-CA",
+                publisher: { "@id": `${SITE_URL}/#organization` },
+              },
             ],
           }) }}
         />
