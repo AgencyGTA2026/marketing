@@ -11,7 +11,7 @@ export function Footer() {
       <div className="wrap footer-main">
         <div className="footer-brand">
           <Link href="/" aria-label="Bayline Digital home"><Logo /></Link>
-          <p>Clear websites and practical digital systems for growing businesses.</p>
+          <p>Clear websites and useful web applications for growing businesses.</p>
         </div>
         <div className="footer-column">
           <span>Explore</span>

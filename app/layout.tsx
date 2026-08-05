@@ -8,9 +8,9 @@ const SITE_URL = "https://www.baylinedigital.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: "Bayline Digital | Websites, Conversion & Automation",
+  title: "Bayline Digital | Websites & Custom Web Apps",
   description:
-    "Bayline Digital helps businesses launch polished websites, modernize outdated systems, and build custom digital tools that save time, reduce friction, and support growth.",
+    "Bayline Digital designs conversion-focused websites and builds custom web applications, portals, dashboards, and connected workflows for growing businesses.",
   alternates: {
     canonical: "/",
   },
