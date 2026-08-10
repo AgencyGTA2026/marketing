@@ -19,7 +19,7 @@ export function Nav() {
         <Link href="/" aria-label="Bayline Digital home"><Logo /></Link>
         <nav className="desktop-nav" aria-label="Main navigation">
           {primaryNavigation.map((item) => (
-            <Link key={item.href} href={item.href} aria-current={pathname === item.href ? "page" : undefined}>
+            <Link key={item.href} href={item.href} aria-current={pathname === item.href || pathname.startsWith(`${item.href}/`) ? "page" : undefined}>
               {item.label}
             </Link>
           ))}

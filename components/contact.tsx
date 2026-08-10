@@ -81,7 +81,7 @@ export function InquiryForm({
     setData((current) => ({
       ...current,
       city: city || params.get("city") || current.city,
-      service: service || current.service,
+      service: service || params.get("service") || current.service,
       sourcePage: sourcePage || window.location.pathname,
       utmSource: params.get("utm_source") || "",
       utmMedium: params.get("utm_medium") || "",
@@ -177,6 +177,7 @@ export function InquiryForm({
       <div className="form-heading">
         <span>{compact ? "FREE HOMEPAGE REVIEW" : "NEW PROJECT INQUIRY"}</span>
         <h2>{heading ?? (compact ? "Tell us where to look." : "Tell us what you are working on.")}</h2>
+        <p>{businessConfig.responsePromise}</p>
       </div>
       <FormField label="Name" id={`${sourcePage}-name`} error={touched.name ? errors.name : undefined}>
         <input id={`${sourcePage}-name`} value={data.name} onChange={update("name")} onBlur={() => setTouched((v) => ({ ...v, name: true }))} autoComplete="name" />

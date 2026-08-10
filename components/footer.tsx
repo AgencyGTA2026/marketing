@@ -16,6 +16,7 @@ export function Footer() {
         <div className="footer-column">
           <span>Explore</span>
           {primaryNavigation.map((link) => <Link key={link.href} href={link.href}>{link.label}</Link>)}
+          <Link href="/locations">Locations</Link>
           <Link href="/contact">Contact</Link>
         </div>
         <div className="footer-column footer-services">

@@ -6,6 +6,7 @@ import { Branding, Markdown } from "@autoblogwriter/sdk/react";
 import Link from "next/link";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import { ClosingCTA } from "@/components/editorial";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -29,7 +30,8 @@ export default async function BlogArticle({ params }: Props) {
   const image = post.images?.hero?.url ?? post.metadata?.heroImageUrl ?? post.metadata?.ogImageUrl;
   const jsonLd = post.metadata?.jsonLd ? JSON.stringify(post.metadata.jsonLd).replaceAll("https://baylinedigital.com", SITE_URL) : null;
   return <><Nav /><main>{jsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd }} />}
-    <article><header className="article-header wrap"><Link className="article-back" href="/blog">← All articles</Link><div className="blog-meta"><span>{formatDate(post.publishedAt ?? post.updatedAt)}</span>{post.metadata?.readingTimeMinutes && <span>{post.metadata.readingTimeMinutes} min read</span>}{post.categories?.[0] && <span>{post.categories[0]}</span>}</div><h1>{post.title}</h1>{post.excerpt && <p>{post.excerpt}</p>}</header>
+    <Breadcrumbs items={[{ label: "Blog", href: "/blog" }, { label: post.title, href: `/blog/${slug}` }]} />
+    <article><header className="article-header wrap"><div className="blog-meta"><span>{formatDate(post.publishedAt ?? post.updatedAt)}</span>{post.metadata?.readingTimeMinutes && <span>{post.metadata.readingTimeMinutes} min read</span>}{post.categories?.[0] && <span>{post.categories[0]}</span>}</div><h1>{post.title}</h1>{post.excerpt && <p>{post.excerpt}</p>}</header>
     {image && <div className="article-hero-image wrap"><img src={image} alt={post.title} /></div>}
     <section className="article-body wrap"><div><Markdown source={post.content} className="bayline-blog-markdown" /><ArticleFaq post={post} />{post.branding?.brandingRequired && <Branding linkComponent={Link} className="article-branding" />}</div><aside><div><span>Published</span><p>{formatDate(post.publishedAt ?? post.updatedAt)}</p></div>{post.metadata?.readingTimeMinutes && <div><span>Reading time</span><p>{post.metadata.readingTimeMinutes} minutes</p></div>}<div><span>Published by</span><p>Bayline Digital</p></div></aside></section></article>
     <RelatedPosts posts={post.relatedPosts} />

@@ -2,19 +2,30 @@ import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import Script from "next/script";
+import { SITE_URL } from "@/lib/seo";
 import "./globals.css";
-
-const SITE_URL = "https://www.baylinedigital.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: "Bayline Digital | Websites & Custom Web Apps",
   description:
     "Bayline Digital designs conversion-focused websites and builds custom web applications, portals, dashboards, and connected workflows for growing businesses.",
-  alternates: {
-    canonical: "/",
-  },
   manifest: "/site.webmanifest",
+  openGraph: {
+    title: "Bayline Digital | Websites & Custom Web Apps",
+    description:
+      "Bayline Digital designs conversion-focused websites and builds custom web applications, portals, dashboards, and connected workflows for growing businesses.",
+    url: SITE_URL,
+    siteName: "Bayline Digital",
+    locale: "en_CA",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "Bayline Digital | Websites & Custom Web Apps",
+    description:
+      "Conversion-focused websites and useful custom web apps for growing businesses.",
+  },
   robots: {
     index: true,
     follow: true,

@@ -5,10 +5,12 @@ import { Nav } from "./nav";
 import { Footer } from "./footer";
 import { FAQList, PrimaryButton, SectionHeading } from "./editorial";
 import { InquiryForm } from "./contact";
+import { Breadcrumbs } from "./breadcrumbs";
 
 export function ServicePage({ service }: { service: ServiceDetailData }) {
   const related = Object.values(SERVICES_DATA).filter((item) => item.slug !== service.slug).slice(0, 3);
   return <><Nav /><main>
+    <Breadcrumbs items={[{ label: "Services", href: "/services" }, { label: service.title, href: `/services/${service.slug}` }]} />
     <section className="service-detail-hero wrap"><div><p className="eyebrow">{service.hero.badge}</p><h1>{service.hero.headline}</h1><p>{service.hero.subheadline}</p><PrimaryButton href="#inquiry">Discuss this service</PrimaryButton></div><div className="fit-panel"><span>BEST FIT</span><h2>{service.bestFit.title}</h2><p>{service.bestFit.description}</p><ul>{service.bestFit.bullets.map((item) => <li key={item}>{item}</li>)}</ul></div></section>
     <section className="detail-section detail-dark"><div className="wrap"><SectionHeading eyebrow="WHAT THIS SOLVES" title={service.detailsTitle} description={service.detailsDescription} /><div className="editorial-rows">{service.problems.map((item, index) => <article key={item.title}><span>{String(index + 1).padStart(2, "0")}</span><h3>{item.title}</h3><p>{item.description}</p></article>)}</div></div></section>
     <section className="detail-section wrap"><SectionHeading eyebrow="WHAT WE BUILD" title="Practical deliverables, clearly defined." /><div className="deliverable-rows">{service.deliverables.map((item, index) => <article key={item.title}><span>{String(index + 1).padStart(2, "0")}</span><div><h3>{item.title}</h3><p>{item.description}</p></div><ul>{item.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}</ul></article>)}</div></section>

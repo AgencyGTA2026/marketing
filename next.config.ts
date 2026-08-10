@@ -4,18 +4,24 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   serverExternalPackages: ["@resvg/resvg-js"],
   async headers() {
-    const noIndexHeaders = [
+    const assetNoIndexHeaders = [
       {
         key: "X-Robots-Tag",
-        value: "noindex, nofollow, nosnippet",
+        value: "noindex",
+      },
+    ];
+    const privateNoIndexHeaders = [
+      {
+        key: "X-Robots-Tag",
+        value: "noindex, nofollow",
       },
     ];
 
     return [
-      { source: "/site.webmanifest", headers: noIndexHeaders },
-      { source: "/_next/:path*", headers: noIndexHeaders },
-      { source: "/api/:path*", headers: noIndexHeaders },
-      { source: "/studio/:path*", headers: noIndexHeaders },
+      { source: "/site.webmanifest", headers: assetNoIndexHeaders },
+      { source: "/_next/:path*", headers: assetNoIndexHeaders },
+      { source: "/api/:path*", headers: privateNoIndexHeaders },
+      { source: "/studio/:path*", headers: privateNoIndexHeaders },
     ];
   },
 };

@@ -3,6 +3,7 @@ import { generateBlogSitemap } from "@autoblogwriter/sdk/next";
 import { SERVICES_DATA } from "@/lib/data/services";
 import { INDUSTRIES_DATA } from "@/lib/data/industries";
 import { LOCATIONS_DATA } from "@/lib/data/locations";
+import { FREE_TOOLS } from "@/lib/data/tools";
 
 const FALLBACK_SITE_URL = "https://www.baylinedigital.com";
 
@@ -19,6 +20,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/blog",
     "/services",
     "/industries",
+    "/locations",
+    "/tools",
+    ...FREE_TOOLS.map((tool) => `/tools/${tool.slug}`),
     "/contact",
     ...Object.keys(SERVICES_DATA).map((slug) => `/services/${slug}`),
     ...Object.keys(INDUSTRIES_DATA).map((slug) => `/industries/${slug}`),

@@ -6,10 +6,12 @@ export const businessConfig = {
   phone: "+1 (613) 818-8550",
   hours: "Mon–Fri · 9am–5pm EST",
   office: "Toronto, Ontario",
+  responsePromise: "Personal reply within one business day.",
 } as const;
 
 export const primaryNavigation = [
   { label: "Services", href: "/services" },
+  { label: "Tools", href: "/tools" },
   { label: "Industries", href: "/industries" },
   { label: "Blog", href: "/blog" },
 ] as const;

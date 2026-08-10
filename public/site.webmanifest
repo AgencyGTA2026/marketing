@@ -1,6 +1,10 @@
 {
   "name": "Bayline Digital",
   "short_name": "Bayline",
+  "description": "Bayline Digital websites, web applications, and automation systems.",
+  "start_url": "/",
+  "scope": "/",
+  "lang": "en-CA",
   "icons": [
     {
       "src": "/android-chrome-192x192.png",
@@ -13,7 +17,7 @@
       "type": "image/png"
     }
   ],
-  "theme_color": "#071A3D",
-  "background_color": "#FFFFFF",
+  "theme_color": "#121820",
+  "background_color": "#F4F1EA",
   "display": "standalone"
 }
