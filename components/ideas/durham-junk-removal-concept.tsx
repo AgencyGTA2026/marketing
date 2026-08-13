@@ -93,12 +93,18 @@ export function DurhamJunkRemovalConcept() {
     setStage("success");
   }
 
+  function startQuickRequest(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setStage("lead");
+    requestAnimationFrame(() => document.querySelector("#quote-builder")?.scrollIntoView({ behavior: "smooth" }));
+  }
+
   return (
     <main className={styles.site}>
       <header className={styles.header}>
         <a className={styles.brand} href="#durham-top" aria-label="Durham Junk Removal concept home">
           <span className={styles.brandMark} aria-hidden="true">
-            <Truck size={21} strokeWidth={2.4} />
+            <Truck size={24} strokeWidth={2.5} />
           </span>
           <span>
             <strong>Durham</strong>
@@ -120,8 +126,8 @@ export function DurhamJunkRemovalConcept() {
 
       <section className={styles.hero} id="durham-top">
         <div className={styles.heroCopy}>
-          <p className={styles.eyebrow}><span /> Local hauling across Durham Region</p>
-          <h1>Clear the clutter.<br /><em>Keep your weekend.</em></h1>
+          <p className={styles.eyebrow}><span /> Responsible pickup · Local team</p>
+          <h1>Junk removal that gives <em>your space back.</em></h1>
           <p className={styles.heroDescription}>
             Point to what needs to go. Durham Junk Removal handles the lifting, loading, and dump run—with a clear plan before pickup day.
           </p>
@@ -142,8 +148,28 @@ export function DurhamJunkRemovalConcept() {
           </div>
         </div>
 
+        <aside className={styles.heroServiceCard}>
+          <span><Truck size={16} /> Local Durham crew</span>
+          <strong>From one bulky item to a complete cleanout.</strong>
+          <a href="#quote-builder">See pickup options <ArrowRight size={15} /></a>
+        </aside>
+
+        <form className={styles.quickRequest} onSubmit={startQuickRequest}>
+          <label>Your name<input name="quick-name" autoComplete="name" placeholder="Your name" required /></label>
+          <label>Service type<select name="quick-service" defaultValue=""><option value="" disabled>Select a service</option><option>Home cleanout</option><option>Furniture or appliance</option><option>Yard waste</option><option>Renovation debris</option></select></label>
+          <label>Pickup area<select name="quick-area" defaultValue=""><option value="" disabled>Select your city</option>{AREAS.map((area) => <option key={area}>{area}</option>)}</select></label>
+          <label>Timing<select name="quick-timing" defaultValue="this-week"><option value="this-week">This week</option><option value="next-week">Next week</option><option value="flexible">I’m flexible</option></select></label>
+          <button type="submit">Request pickup <ArrowRight size={16} /></button>
+          <p>Demo only—nothing is sent or stored.</p>
+        </form>
+
         <div className={styles.quoteWrap} id="quote-builder">
-          <div className={styles.quoteGlow} aria-hidden="true" />
+          <div className={styles.quoteIntro}>
+            <p className={styles.kicker}>Quick quote</p>
+            <h2>Know your load.<br />Get a useful starting range.</h2>
+            <p>Choose the type of junk, how much truck space it may use, and the pickup access. Then send the details needed to confirm the job.</p>
+            <ul><li><Check size={14} /> No obligation</li><li><Check size={14} /> Photo upload concept</li><li><Check size={14} /> Final price confirmed before pickup</li></ul>
+          </div>
           <section className={styles.quoteCard} aria-live="polite">
             <div className={styles.quoteHeader}>
               <div>
@@ -325,7 +351,7 @@ export function DurhamJunkRemovalConcept() {
 
       <section className={styles.localSection}>
         <div className={styles.ownerCard}>
-          <div className={styles.ownerMark}>BM</div>
+          <div className={styles.ownerMark}><Truck size={76} strokeWidth={1.6} /></div>
           <div><span>Local owner</span><strong>Brandon Morrison</strong></div>
         </div>
         <div className={styles.localCopy}>
@@ -359,7 +385,7 @@ export function DurhamJunkRemovalConcept() {
 
       <footer className={styles.footer}>
         <a className={styles.brand} href="#durham-top">
-          <span className={styles.brandMark}><Truck size={20} /></span>
+          <span className={styles.brandMark}><Truck size={23} /></span>
           <span><strong>Durham</strong><small>Junk Removal</small></span>
         </a>
         <p>Serving Oshawa, Whitby, Ajax, Pickering, Bowmanville, Courtice, and nearby Durham communities.</p>

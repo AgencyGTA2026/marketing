@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import { ArrowRight, ArrowUpRight, Play } from "lucide-react";
 import { DurhamJunkRemovalConcept } from "@/components/ideas/durham-junk-removal-concept";
 import { Logo } from "@/components/logo";
+import { businessConfig } from "@/lib/data/business";
 import type { ProspectIdea } from "@/lib/data/ideas";
 
 type IdeaPalette = CSSProperties & {
@@ -37,6 +38,9 @@ export function IdeaPreview({ idea }: { idea: ProspectIdea }) {
                 <Play size={11} fill="currentColor" /> Walkthrough
               </a>
             )}
+            <a href={businessConfig.siteUrl} target="_blank" rel="noreferrer">
+              Visit Bayline <ArrowUpRight size={12} />
+            </a>
             <a className="idea-float-cta" href={idea.bookingUrl}>Discuss this idea <ArrowUpRight size={13} /></a>
           </div>
         </div>

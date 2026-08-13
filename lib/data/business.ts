@@ -1,6 +1,7 @@
 export const businessConfig = {
   name: "Bayline Digital Inc.",
   shortName: "Bayline Digital",
+  siteUrl: "https://www.baylinedigital.com",
   calendlyUrl: process.env.NEXT_PUBLIC_CALENDLY_URL || "https://calendly.com/bayline-digital/intro",
   email: "contact@baylinedigital.com",
   phone: "+1 (613) 818-8550",
