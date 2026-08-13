@@ -1,0 +1,28 @@
+# orc configuration for this repo — only what is repo-specific.
+# Global defaults (port_stride, max_slots, timeouts) live in ~/.orc/config.toml.
+
+# Commands run in every fresh worktree before services start (fail loud).
+setup = [
+  "pnpm install --prefer-offline",
+  # "cp $ORC_REPO_ROOT/.env.local .env.local",
+]
+
+[service.web]
+cmd       = "pnpm dev"   # must honor $PORT (or use {port} in the command)
+base_port = 3000         # slot N runs on base_port + N*port_stride
+health    = { type = "http", path = "/", grace = "30s" }
+
+# [service.worker]
+# cmd       = "pnpm worker"
+# base_port = 3010       # must differ from other services modulo port_stride
+# health    = { type = "tcp" }
+
+# Per-slot private infrastructure, for work that would MUTATE shared infra
+# (e.g. schema migrations). "orc sandbox <slot>" (or "orc up --sandbox")
+# runs provision, injects env into the slot's services, and destroys it on
+# removal. {slot} and {branch} interpolate in env values.
+# [sandbox]
+# provision = ["createdb myapp_s$ORC_SLOT && pg_dump myapp | psql myapp_s$ORC_SLOT"]
+# destroy   = ["dropdb --if-exists myapp_s$ORC_SLOT"]
+#   [sandbox.env]
+#   DATABASE_URL = "postgres://localhost:5432/myapp_s{slot}"

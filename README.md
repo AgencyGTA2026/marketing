@@ -70,6 +70,12 @@ pnpm dlx shadcn@latest add dialog
 
 `components.json` is already configured for the **new-york** style, neutral base, CSS variables, and `@/` path alias.
 
+## Prospect idea previews
+
+Private, no-index concept pages for warm leads live at `/ideas/[slug]`. Prospect copy, colours, and concept content are configured in `lib/data/ideas.ts`; the route is deliberately absent from the public navigation and sitemap.
+
+See [Deploying and sharing prospect ideas](docs/deploy-idea-previews.md) for the repeatable publishing workflow and privacy guidance.
+
 ## Notes
 
 - The only piece of custom CSS in the project is a subtle grain overlay (`grain` utility in `globals.css`), kept because a `data:` SVG noise pattern cannot be expressed as a Tailwind utility.

@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { hostnameFromHostHeader, isStudioHostname } from "@/lib/local-studio";
 
 export function middleware(request: NextRequest) {
+  if (request.nextUrl.pathname.startsWith("/ideas/")) {
+    const response = NextResponse.next();
+    response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
+    return response;
+  }
+
   const hostHeader = request.headers.get("host") || request.headers.get("x-forwarded-host") || request.nextUrl.hostname;
   if (!isStudioHostname(hostnameFromHostHeader(hostHeader))) {
     return new NextResponse("Not Found", {
@@ -24,5 +30,6 @@ export const config = {
     "/studio/:path*",
     "/api/studio/:path*",
     "/api/auth/:path*",
+    "/ideas/:path*",
   ],
 };
