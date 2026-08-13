@@ -12,8 +12,6 @@ describe("prospect ideas", () => {
   it("contains the content needed to render a complete concept", () => {
     for (const idea of PROSPECT_IDEAS) {
       expect(idea.company.length).toBeGreaterThan(2);
-      expect(idea.pitch.observations).toHaveLength(3);
-      expect(idea.benefits).toHaveLength(3);
       expect(idea.concept.services).toHaveLength(3);
       expect(idea.concept.proof).toHaveLength(3);
       expect(idea.bookingUrl).toMatch(/^https:\/\//);

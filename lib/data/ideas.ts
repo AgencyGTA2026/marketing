@@ -6,19 +6,6 @@ export type ProspectIdea = {
   preparedOn: string;
   walkthroughUrl?: string;
   bookingUrl: string;
-  pitch: {
-    eyebrow: string;
-    title: string;
-    summary: string;
-    opportunityTitle: string;
-    opportunitySummary: string;
-    observations: readonly string[];
-  };
-  benefits: ReadonlyArray<{
-    number: string;
-    title: string;
-    description: string;
-  }>;
   concept: {
     brandName: string;
     location: string;
@@ -55,40 +42,6 @@ export const PROSPECT_IDEAS = [
     company: "Harbour Home Services",
     preparedOn: "August 2026",
     bookingUrl: businessConfig.calendlyUrl,
-    pitch: {
-      eyebrow: "A website idea for Harbour Home Services",
-      title: "Make the first visit feel as dependable as the service.",
-      summary:
-        "This concept gives homeowners a faster path from an urgent problem to a confident booking, while making Harbour's local experience clear from the first screen.",
-      opportunityTitle: "The opportunity",
-      opportunitySummary:
-        "Turn the website into a useful first interaction instead of a digital brochure.",
-      observations: [
-        "Lead with the problems homeowners need solved, not a long company introduction.",
-        "Make availability, service area, and the booking path visible immediately.",
-        "Use proof and a clear process to reduce hesitation before the first call.",
-      ],
-    },
-    benefits: [
-      {
-        number: "01",
-        title: "Faster decisions",
-        description:
-          "Visitors can understand the service, coverage area, and next step without searching through the site.",
-      },
-      {
-        number: "02",
-        title: "Stronger local trust",
-        description:
-          "Experience, response time, and homeowner proof are built into the page rather than hidden in separate sections.",
-      },
-      {
-        number: "03",
-        title: "More useful enquiries",
-        description:
-          "A focused request flow can collect the job type, urgency, and location before the first conversation.",
-      },
-    ],
     concept: {
       brandName: "Harbour",
       location: "Home Services · Toronto & GTA",

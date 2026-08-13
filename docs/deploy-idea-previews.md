@@ -34,7 +34,7 @@ After Git integration is connected, each pull request receives a preview deploym
 1. Open `lib/data/ideas.ts`.
 2. Duplicate the existing object in `PROSPECT_IDEAS`.
 3. Change `slug` to a unique lowercase, hyphenated value. For a less guessable unlisted URL, add a short random suffix such as `company-name-k7m4`.
-4. Replace every company-specific observation, benefit, headline, proof point, service, and colour.
+4. Replace every company-specific headline, proof point, service, and colour.
 5. Set `walkthroughUrl` to the prospect's Loom link. Leave it out when no recording is ready; the walkthrough button will not render.
 6. Keep all claims clearly framed as concept copy. Use public information or fictional placeholders until the prospect verifies a claim.
 7. Run:
