@@ -1,6 +1,8 @@
 import type { CSSProperties } from "react";
 import { ArrowRight, ArrowUpRight, Play } from "lucide-react";
+import { DurhamJunkRemovalConcept } from "@/components/ideas/durham-junk-removal-concept";
 import { Logo } from "@/components/logo";
+import { businessConfig } from "@/lib/data/business";
 import type { ProspectIdea } from "@/lib/data/ideas";
 
 type IdeaPalette = CSSProperties & {
@@ -21,7 +23,7 @@ export function IdeaPreview({ idea }: { idea: ProspectIdea }) {
   } as IdeaPalette;
 
   return (
-    <div className="idea-shell">
+    <div className={`idea-shell${idea.template === "durham-junk-removal" ? " idea-shell-durham" : ""}`}>
       <details className="idea-float" open>
         <summary>
           <Logo />
@@ -36,22 +38,28 @@ export function IdeaPreview({ idea }: { idea: ProspectIdea }) {
                 <Play size={11} fill="currentColor" /> Walkthrough
               </a>
             )}
+            <a href={businessConfig.siteUrl} target="_blank" rel="noreferrer">
+              Visit Bayline <ArrowUpRight size={12} />
+            </a>
             <a className="idea-float-cta" href={idea.bookingUrl}>Discuss this idea <ArrowUpRight size={13} /></a>
           </div>
         </div>
       </details>
 
-      <main className="prospect-site" style={palette}>
-        <header className="prospect-nav">
-          <a className="prospect-brand" href="#top" aria-label={`${idea.concept.brandName} concept home`}>
-            <span>{idea.concept.brandName.charAt(0)}</span>
-            <strong>{idea.concept.brandName}</strong>
-          </a>
-          <nav aria-label="Concept navigation">
-            {idea.concept.nav.map((item) => <a href="#services" key={item}>{item}</a>)}
-          </nav>
-          <a className="prospect-nav-cta" href="#contact">Book a visit <ArrowUpRight size={13} /></a>
-        </header>
+      {idea.template === "durham-junk-removal" ? (
+        <DurhamJunkRemovalConcept />
+      ) : (
+        <main className="prospect-site" style={palette}>
+          <header className="prospect-nav">
+            <a className="prospect-brand" href="#top" aria-label={`${idea.concept.brandName} concept home`}>
+              <span>{idea.concept.brandName.charAt(0)}</span>
+              <strong>{idea.concept.brandName}</strong>
+            </a>
+            <nav aria-label="Concept navigation">
+              {idea.concept.nav.map((item) => <a href="#services" key={item}>{item}</a>)}
+            </nav>
+            <a className="prospect-nav-cta" href="#contact">Book a visit <ArrowUpRight size={13} /></a>
+          </header>
 
         <section className="prospect-hero" id="top">
           <div className="prospect-hero-copy">
@@ -111,7 +119,8 @@ export function IdeaPreview({ idea }: { idea: ProspectIdea }) {
           <div><p>{idea.concept.closing.eyebrow}</p><h2>{idea.concept.closing.title}</h2></div>
           <div><p>{idea.concept.closing.description}</p><a href="#contact">{idea.concept.closing.cta} <ArrowRight size={14} /></a></div>
         </section>
-      </main>
+        </main>
+      )}
 
       <footer className="idea-disclaimer">
         <p>Unofficial concept prepared by Bayline Digital for {idea.company}. Not commissioned or approved by the company.</p>

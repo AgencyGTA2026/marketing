@@ -1187,6 +1187,7 @@ button, summary, a { -webkit-tap-highlight-color: transparent; }
 
 @media (max-width: 760px) {
   .idea-float { inset: auto 12px 12px auto; width: min(340px, calc(100% - 24px)); }
+  .idea-shell-durham .idea-float { bottom: 74px; }
   .idea-float:not([open]) { width: 43px; }
   .idea-disclaimer { min-height: 86px; align-items: flex-start; flex-direction: column; justify-content: center; gap: 8px; padding: 16px; }
   .idea-disclaimer p { max-width: 330px; }
