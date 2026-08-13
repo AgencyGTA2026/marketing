@@ -340,24 +340,25 @@ export function DurhamJunkRemovalConcept() {
       <section className={styles.process} id="durham-process">
         <div className={styles.processHeading}>
           <p className={styles.kicker}>How it works</p>
-          <h2>Point. Plan. Gone.</h2>
+          <h2>Three steps. One clear space.</h2>
+          <p>Share the job, confirm the details, and let the crew handle the heavy part.</p>
         </div>
         <ol>
-          <li><span>01</span><div><strong>Show the load</strong><p>Build a quick estimate or text photos of what needs to go.</p></div></li>
-          <li><span>02</span><div><strong>Confirm the job</strong><p>Review the items, access, final price, and a pickup time that works.</p></div></li>
-          <li><span>03</span><div><strong>Reclaim the space</strong><p>Durham Junk Removal handles the lifting, loading, and haul-away.</p></div></li>
+          <li><span>01</span><div><ImagePlus size={21} /><strong>Show the load</strong><p>Build a quick estimate or text photos of what needs to go.</p></div></li>
+          <li><span>02</span><div><MessageSquareText size={21} /><strong>Confirm the details</strong><p>Review the access, final price, and a pickup time that works.</p></div></li>
+          <li><span>03</span><div><Truck size={21} /><strong>Clear the space</strong><p>The crew handles the lifting, loading, and haul-away.</p></div></li>
         </ol>
       </section>
 
       <section className={styles.localSection}>
         <div className={styles.ownerCard}>
-          <div className={styles.ownerMark}><Truck size={76} strokeWidth={1.6} /></div>
-          <div><span>Local owner</span><strong>Brandon Morrison</strong></div>
+          <div className={styles.ownerMark}><span>Owner photo</span></div>
+          <div><span>Local owner</span><strong>Owner name</strong></div>
         </div>
         <div className={styles.localCopy}>
           <p className={styles.kicker}>Local by design</p>
           <h2>Hard work, clear communication, and follow-through.</h2>
-          <p>Durham Junk Removal is a young local business built around a straightforward promise: understand the job, agree on the plan, and get it handled with respect for the customer’s space and time.</p>
+          <p>Durham Junk Removal is built around a straightforward promise: understand the job, agree on the plan, and get it handled with respect for the customer’s space and time.</p>
           <a href={`tel:${PHONE_LINK}`}><Phone size={14} /> Talk directly: {PHONE_DISPLAY}</a>
         </div>
       </section>
