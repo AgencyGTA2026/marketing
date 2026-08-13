@@ -22,24 +22,24 @@ export function IdeaPreview({ idea }: { idea: ProspectIdea }) {
 
   return (
     <div className="idea-shell">
-      <header className="idea-banner">
-        <a href="https://www.baylinedigital.com" aria-label="Bayline Digital home">
+      <details className="idea-float" open>
+        <summary>
           <Logo />
-        </a>
-        <p>
-          Concept prepared for <strong>{idea.company}</strong>
-          <span aria-hidden="true" />
-          {idea.preparedOn}
-        </p>
-        <div>
-          {idea.walkthroughUrl && (
-            <a href={idea.walkthroughUrl} target="_blank" rel="noreferrer">
-              <Play size={11} fill="currentColor" /> Walkthrough
-            </a>
-          )}
-          <a className="idea-banner-cta" href={idea.bookingUrl}>Discuss this idea <ArrowUpRight size={13} /></a>
+          <span className="idea-float-hide">Hide <span aria-hidden="true">−</span></span>
+          <span className="idea-float-show">Open concept information</span>
+        </summary>
+        <div className="idea-float-body">
+          <p>Concept prepared for <strong>{idea.company}</strong><span>{idea.preparedOn}</span></p>
+          <div>
+            {idea.walkthroughUrl && (
+              <a href={idea.walkthroughUrl} target="_blank" rel="noreferrer">
+                <Play size={11} fill="currentColor" /> Walkthrough
+              </a>
+            )}
+            <a className="idea-float-cta" href={idea.bookingUrl}>Discuss this idea <ArrowUpRight size={13} /></a>
+          </div>
         </div>
-      </header>
+      </details>
 
       <main className="prospect-site" style={palette}>
         <header className="prospect-nav">
