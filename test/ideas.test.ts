@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { getProspectIdea, PROSPECT_IDEAS } from "@/lib/data/ideas";
+import { calculateDurhamQuote, formatQuoteRange } from "@/lib/ideas/durham-quote";
 
 describe("prospect ideas", () => {
   it("uses unique, URL-safe slugs", () => {
@@ -20,6 +21,23 @@ describe("prospect ideas", () => {
 
   it("finds known concepts and rejects unknown slugs", () => {
     expect(getProspectIdea("harbour-home-services")?.company).toBe("Harbour Home Services");
+    expect(getProspectIdea("durham-junk-removal")?.template).toBe("durham-junk-removal");
     expect(getProspectIdea("missing-company")).toBeUndefined();
+  });
+
+  it("calculates the Durham concept estimate from volume, material, and access", () => {
+    expect(calculateDurhamQuote({ junkType: "household", loadSize: "quarter", access: "curbside" })).toEqual({
+      minimum: 159,
+      maximum: 239,
+    });
+
+    const complexLoad = calculateDurhamQuote({
+      junkType: "renovation",
+      loadSize: "half",
+      access: "stairs",
+    });
+
+    expect(complexLoad).toEqual({ minimum: 399, maximum: 579 });
+    expect(formatQuoteRange(complexLoad)).toBe("$399–$579");
   });
 });

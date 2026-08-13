@@ -4,6 +4,7 @@ export type ProspectIdea = {
   slug: string;
   company: string;
   preparedOn: string;
+  template?: "standard" | "durham-junk-removal";
   walkthroughUrl?: string;
   bookingUrl: string;
   concept: {
@@ -93,8 +94,65 @@ export const PROSPECT_IDEAS = [
       },
     },
   },
+  {
+    slug: "durham-junk-removal",
+    company: "Durham Junk Removal",
+    preparedOn: "August 2026",
+    template: "durham-junk-removal",
+    bookingUrl: businessConfig.calendlyUrl,
+    concept: {
+      brandName: "Durham Junk Removal",
+      location: "Junk Removal · Durham Region",
+      nav: ["Services", "How it works", "Service areas"],
+      hero: {
+        eyebrow: "Local hauling without the lost weekend",
+        title: "Clear the clutter. Keep your weekend.",
+        description:
+          "Tell us what needs to go and get a quick concept estimate before choosing your pickup window.",
+        primaryCta: "Build my estimate",
+        secondaryCta: "Call 905-410-4036",
+      },
+      proof: [
+        { value: "Call or text", label: "Choose the easiest way to reach us" },
+        { value: "Photo quotes", label: "Show the load before booking" },
+        { value: "Durham-wide", label: "Local service across the region" },
+      ],
+      services: [
+        {
+          number: "01",
+          title: "Home cleanouts",
+          description: "Clear garages, basements, moves, and accumulated household clutter.",
+        },
+        {
+          number: "02",
+          title: "Bulky pickups",
+          description: "Remove furniture, appliances, and awkward items without the heavy lifting.",
+        },
+        {
+          number: "03",
+          title: "Project debris",
+          description: "Haul yard waste and light renovation debris after the work is finished.",
+        },
+      ],
+      process: ["Describe the load", "Confirm the job", "Reclaim your space"],
+      closing: {
+        eyebrow: "Ready when you are",
+        title: "Show us what needs to go.",
+        description:
+          "Start with a quick estimate, then send the details Durham Junk Removal needs to confirm the job.",
+        cta: "Get my estimate",
+      },
+      palette: {
+        ink: "#071d36",
+        paper: "#f4f7f2",
+        accent: "#78c83f",
+        soft: "#dfeaf1",
+        white: "#ffffff",
+      },
+    },
+  },
 ] as const satisfies readonly ProspectIdea[];
 
-export function getProspectIdea(slug: string) {
+export function getProspectIdea(slug: string): ProspectIdea | undefined {
   return PROSPECT_IDEAS.find((idea) => idea.slug === slug);
 }
