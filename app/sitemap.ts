@@ -4,6 +4,7 @@ import { SERVICES_DATA } from "@/lib/data/services";
 import { INDUSTRIES_DATA } from "@/lib/data/industries";
 import { LOCATIONS_DATA } from "@/lib/data/locations";
 import { FREE_TOOLS } from "@/lib/data/tools";
+import { APP_PAGES } from "@/lib/data/apps";
 
 const FALLBACK_SITE_URL = "https://www.baylinedigital.com";
 
@@ -24,6 +25,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/tools",
     ...FREE_TOOLS.map((tool) => `/tools/${tool.slug}`),
     "/contact",
+    ...APP_PAGES,
     ...Object.keys(SERVICES_DATA).map((slug) => `/services/${slug}`),
     ...Object.keys(INDUSTRIES_DATA).map((slug) => `/industries/${slug}`),
     ...Object.keys(LOCATIONS_DATA).map((slug) => `/locations/${slug}`),
