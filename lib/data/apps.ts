@@ -6,4 +6,12 @@ export const SIP_AND_SORT: AppInfo = {
   tagline: "A cozy café sort puzzle for iPhone.",
 };
 
-export const APP_PAGES = ["", "/support", "/privacy", "/terms"].map((path) => `/${SIP_AND_SORT.slug}${path}`);
+export const FLYAWAY_FLOCK: AppInfo = {
+  name: "Flyaway Flock",
+  slug: "flyaway-flock",
+  tagline: "A tap-to-escape bird puzzle for iPhone.",
+};
+
+const APPS = [SIP_AND_SORT, FLYAWAY_FLOCK];
+
+export const APP_PAGES = APPS.flatMap((app) => ["", "/support", "/privacy", "/terms"].map((path) => `/${app.slug}${path}`));
