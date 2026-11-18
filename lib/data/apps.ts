@@ -24,6 +24,12 @@ export const TILE_AND_THRONE: AppInfo = {
   tagline: "A word duel game for iPhone.",
 };
 
-const APPS = [SIP_AND_SORT, FLYAWAY_FLOCK, WORD_HARBOR, TILE_AND_THRONE];
+export const ECHO: AppInfo = {
+  name: "Echo",
+  slug: "echo",
+  tagline: "A grid puzzle game for iPhone.",
+};
+
+const APPS = [SIP_AND_SORT, FLYAWAY_FLOCK, WORD_HARBOR, TILE_AND_THRONE, ECHO];
 
 export const APP_PAGES = APPS.flatMap((app) => ["", "/support", "/privacy", "/terms"].map((path) => `/${app.slug}${path}`));
