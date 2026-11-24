@@ -4,7 +4,7 @@ import { buildPageMetadata } from "@/lib/seo";
 
 export const metadata = buildPageMetadata({
   title: "Sip & Sort Support | Bayline Digital",
-  description: "Help with Sip & Sort: purchases, restoring Remove Ads, progress, ads and privacy choices, and how to contact Bayline Digital.",
+  description: "Help with Sip & Sort: purchases, restoring Remove Ads, iCloud progress, leaderboards, ads and privacy choices, and how to contact Bayline Digital.",
   path: "/sip-and-sort/support",
 });
 
@@ -22,8 +22,11 @@ export default function SipAndSortSupportPage() {
       <h2>Refunds</h2>
       <p>Apple handles payments and refunds. Request a refund at <a href="https://reportaproblem.apple.com">reportaproblem.apple.com</a>.</p>
 
-      <h2>My progress</h2>
-      <p>Your progress is saved on your iPhone. Deleting the app deletes local progress, and there’s no account or cloud backup, so it can’t be recovered after the app is removed.</p>
+      <h2>How do I move my progress to a new iPhone?</h2>
+      <p>Sign in to the new iPhone with the same Apple Account and keep iCloud on. Your progress is saved to your iCloud automatically, and it appears within about a minute of opening the game. The same applies if you delete and reinstall the app. Remove Ads and the Autumn Café Bundle come back through <strong>Restore purchases</strong>. You can check the save status in the app under Settings → iCloud save.</p>
+
+      <h2>Where are the leaderboards?</h2>
+      <p>Open Settings → <strong>Leaderboards</strong>. Leaderboards need Game Center; if you aren’t signed in, the app shows the Game Center sign-in. There are three boards: levels cleared, stars earned, and best Daily Special streak.</p>
 
       <h2>Ads, tracking, and play stats</h2>
       <p>Optional videos give rewards, and ads may appear between some levels unless you buy Remove Ads. You can change ad privacy choices in Settings when they apply to your region, and change tracking permission in iOS Settings → Privacy & Security → Tracking. Turn off <strong>Share anonymous play stats</strong> in the app’s Settings to stop sending gameplay statistics. See the <a href="/sip-and-sort/privacy">privacy policy</a> for details.</p>

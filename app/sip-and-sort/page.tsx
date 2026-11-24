@@ -19,6 +19,7 @@ export default function SipAndSortPage() {
         <li>New twists as you play: mystery layers, frozen jars, customer orders, cups and carafes, syrup pumps, and lidded jars.</li>
         <li>Customers and regulars who tip for their favorite drinks and visit your café as friendships grow.</li>
         <li>Five rooms to decorate and upgrade, a daily puzzle with streaks, and seasonal events.</li>
+        <li>Progress saved to your iCloud so it follows you to a new iPhone, plus Game Center leaderboards.</li>
       </ul>
       <h2>Help and policies</h2>
       <p>Questions or problems? Visit <Link href="/sip-and-sort/support">Sip & Sort support</Link> or email <a href="mailto:contact@baylinedigital.com">contact@baylinedigital.com</a>. Read the <Link href="/sip-and-sort/privacy">privacy policy</Link> and <Link href="/sip-and-sort/terms">terms of use</Link>.</p>
